@@ -148,4 +148,43 @@ namespace utils {
 		return true;
 	}
 
+	bool rectInsideRect(int width, int height, int center_x, int center_y, int rect_width, int rect_height, double rotate){
+		cv::Point2f center(center_x, center_y);
+		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(rect_width, rect_height), rotate);
+		cv::Point2f vertices[4];
+		rRect.points(vertices);
+		for (int i = 0; i < 4; i++)
+			if (!pointInsideRect(width, height, vertices[i]))
+				return false;
+		return true;
+	}
+
+	bool pointInsideRect(int width, int height, cv::Point2f& pt){
+		if (pt.x <= 0 || pt.x >= width)
+			return false;
+		if (pt.y <= 0 || pt.y > height)
+			return false;
+		return true;
+	}
+
+	bool rectIntersecRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, double rotate_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2, double rotate_v2){
+		for (int i = center_x_v1 - rect_width_v1 * 0.5; i <= center_x_v1 + rect_width_v1 * 0.5; i++){
+			for (int j = center_y_v1 - rect_height_v1 * 0.5; j <= center_y_v1 + rect_height_v1 * 0.5; j++){
+				cv::Point2f new_pt = utils::RotatePoint(cv::Point2f(center_x_v1, center_y_v1), cv::Point2f(i, j), (rotate_v1)* M_PI / 180.0);
+				if (pointInsideRotatedRect(center_x_v2, center_y_v2, rect_width_v2, rect_height_v2, rotate_v2, new_pt))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	bool pointInsideRotatedRect(int center_x, int center_y, int rect_width, int rect_height, double rotate, cv::Point2f& pt){
+		cv::Point2f new_pt = utils::RotatePoint(cv::Point2f(center_x, center_y), pt, (-rotate)* M_PI / 180.0);
+		
+		if (new_pt.x < center_x - rect_width * 0.5 || new_pt.x > center_x + rect_width * 0.5)
+			return false;
+		if (new_pt.y < center_y - rect_height * 0.5 || new_pt.y > center_y + rect_height * 0.5)
+			return false;
+		return true;
+	}
 }

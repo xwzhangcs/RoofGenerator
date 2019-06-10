@@ -118,12 +118,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="config.cpp" />
+    <ClCompile Include="drawRotatedRect.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="roofA.cpp" />
+    <ClCompile Include="roofB.cpp" />
     <ClCompile Include="RoofUtils.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="drawRotatedRect.h" />
     <ClInclude Include="print.h" />
+    <ClInclude Include="roofA.h" />
+    <ClInclude Include="roofB.h" />
     <ClInclude Include="roofTypes.h" />
     <ClInclude Include="RoofUtils.h" />
     <ClInclude Include="Utils.h" />
