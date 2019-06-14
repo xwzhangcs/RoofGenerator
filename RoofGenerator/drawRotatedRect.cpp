@@ -8,7 +8,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int center_x, int center_
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;
 	int center_h = center_y;
-	int thickness = 2;
+	int thickness = 1;
 	if (selected_roof_type == RoofTypes::FLAT){
 		cv::Point2f center(center_w, center_h);
 		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), rotate);
@@ -28,7 +28,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int center_x, int center_
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;
 	int center_h = center_y;
-	int thickness = 2;
+	int thickness = 1;
 	if (selected_roof_type == RoofTypes::GABLE || selected_roof_type == RoofTypes::HIP){
 		// draw rect
 		cv::Point2f center(center_w, center_h);

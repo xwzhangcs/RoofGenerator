@@ -3,7 +3,12 @@
 #include "Utils.h"
 #include "roofTypes.h"
 
-cv::Mat RoofB::generateRoof(int width, int height, const Config& roof_paras_main, const Config& roof_paras_sub, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
+cv::Mat RoofB::generateRoof(int width, int height, const Config& roof_paras_main, const Config& roof_paras_sub, const cv::Scalar& bg_color, const cv::Scalar& fg_color, int type, bool bDebug){
+	if (roof_paras_main.roofAspect * roof_paras_main.roofWidth_ratio >= 1.0)
+		return cv::Mat();
+	if (roof_paras_sub.roofAspect * roof_paras_sub.roofWidth_ratio >= 1.0)
+		return cv::Mat();
+	
 	cv::Mat result(height, width, CV_8UC3, bg_color);
 	int imageRoofWidth_main = roof_paras_main.roofWidth_ratio * width;
 	int imageRoofHeight_main = imageRoofWidth_main * roof_paras_main.roofAspect;
@@ -17,7 +22,51 @@ cv::Mat RoofB::generateRoof(int width, int height, const Config& roof_paras_main
 	int center_h_sub = height * roof_paras_sub.center_y_ratio;
 	double rotate_sub = roof_paras_sub.rotate;
 
-	// check 
+	if (bDebug){
+		std::cout << "main (" << center_w_main << ", " << center_h_main << ", " << imageRoofWidth_main << ", " << imageRoofHeight_main << ", " << rotate_main << ")" << std::endl;
+		std::cout << "sub (" << center_w_sub << ", " << center_h_sub << ", " << imageRoofWidth_sub << ", " << imageRoofHeight_sub << ", " << rotate_sub << ")" << std::endl;
+	}
+
+	if (imageRoofWidth_main * imageRoofHeight_main > 5 * imageRoofWidth_sub * imageRoofHeight_sub)
+		return cv::Mat();
+	if (imageRoofWidth_sub * imageRoofHeight_sub > 5 * imageRoofWidth_main * imageRoofHeight_main)
+		return cv::Mat();
+
+	// first check out of boundary
+	if (!utils::rectInsideRect(width, height, center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main)){
+		return cv::Mat();
+	}
+	if (!utils::rectInsideRect(width, height, center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub)){
+		return cv::Mat();
+	}
+	// second check connectivity 
+	if (type == 0) // two independent nodes
+	{
+		if (utils::rectIntersecRect(center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main, center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub))
+			return cv::Mat();
+		if (utils::rectIntersecRect(center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub, center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main))
+			return cv::Mat();
+	}
+	else if (type == 1) // connected
+	{
+		if (!utils::rectIntersecRect(center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main, center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub))
+			return cv::Mat();
+		if (!utils::rectIntersecRect(center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub, center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main))
+			return cv::Mat();
+		if (utils::rectInsideRect(center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main, center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub))
+			return cv::Mat();
+		if (utils::rectInsideRect(center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub, center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main))
+			return cv::Mat();
+		
+		// special L or T
+		if (!utils::rectSideBySideRect(center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main, center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub))
+			return cv::Mat();
+		if (!utils::rectSideBySideRect(center_w_sub, center_h_sub, imageRoofWidth_sub, imageRoofHeight_sub, rotate_sub, center_w_main, center_h_main, imageRoofWidth_main, imageRoofHeight_main, rotate_main))
+			return cv::Mat();
+	}
+	else{
+
+	}
 	
 	// add main roof
 	int thickness = 2;

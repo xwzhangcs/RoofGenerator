@@ -4,7 +4,8 @@
 #include "roofTypes.h"
 
 cv::Mat RoofA::generateRoof(int width, int height, const Config& roof_paras, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
-
+	if (roof_paras.roofAspect * roof_paras.roofWidth_ratio >= 1.0)
+		return cv::Mat();
 	cv::Mat result(height, width, CV_8UC3, bg_color);
 	int imageRoofWidth = roof_paras.roofWidth_ratio * width;
 	double imageRoofAspect = roof_paras.roofAspect;

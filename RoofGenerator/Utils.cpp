@@ -187,4 +187,80 @@ namespace utils {
 			return false;
 		return true;
 	}
+
+	bool rectInsideRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, double rotate_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2, double rotate_v2){
+		cv::Point2f center(center_x_v2, center_y_v2);
+		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(rect_width_v2, rect_height_v2), rotate_v2);
+		cv::Point2f vertices[4];
+		rRect.points(vertices);
+		for (int i = 0; i < 4; i++)
+			if (!pointInsideRotatedRect(center_x_v1, center_y_v1, rect_width_v1, rect_height_v1, rotate_v1, vertices[i]))
+				return false;
+		return true;
+	}
+
+	bool rectSideBySideRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, double rotate_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2, double rotate_v2){
+		cv::Point2f center_v1(center_x_v1, center_y_v1);
+		cv::RotatedRect rRect_v1 = cv::RotatedRect(center_v1, cv::Size2f(rect_width_v1, rect_height_v1), rotate_v1);
+		cv::Point2f vertices_v1[4];
+		rRect_v1.points(vertices_v1);
+		int width_left_v1 = vertices_v1[0].x;
+		int width_right_v1 = vertices_v1[3].x;
+		int height_top_v1 = vertices_v1[1].y;
+		int height_bot_v1 = vertices_v1[3].y;
+		
+		cv::Point2f center_v2(center_x_v2, center_y_v2);
+		cv::RotatedRect rRect_v2 = cv::RotatedRect(center_v2, cv::Size2f(rect_width_v2, rect_height_v2), rotate_v2);
+		cv::Point2f vertices_v2[4];
+		rRect_v2.points(vertices_v2);
+		int width_left_v2 = vertices_v2[0].x;
+		int width_right_v2 = vertices_v2[3].x;
+		int height_top_v2 = vertices_v2[1].y;
+		int height_bot_v2 = vertices_v2[3].y;
+
+		int inside = 0;
+		for (int i = 0; i < 4; i++)
+			if (pointInsideRotatedRect(center_x_v1, center_y_v1, rect_width_v1, rect_height_v1, rotate_v1, vertices_v2[i]))
+				inside++;
+		if (inside == 1)
+			return false;
+
+		/*if (width_left_v1 == width_right_v2 || width_right_v1 == width_left_v2)
+			return true;
+		if (height_top_v1 == height_bot_v2 || height_bot_v1 == height_top_v2)
+			return true;
+		if (center_x_v1 == width_right_v2 || center_x_v1 == width_left_v2)
+			return true;
+		if (center_y_v1 == height_bot_v2 || center_y_v1 == height_top_v2)
+			return true;*/
+		if (abs(width_left_v1 - width_right_v2) < 4 || abs(width_right_v1 - width_left_v2) < 4)
+		return true;
+		if (abs(height_top_v1 - height_bot_v2) < 4 || abs(height_bot_v1 - height_top_v2) < 4)
+		return true;
+		if (abs(center_x_v1 - width_right_v2) < 4 || abs(center_x_v1 - width_left_v2) < 4)
+			return true;
+		if (abs(center_y_v1 - height_bot_v2) < 4 || abs(center_y_v1 - height_top_v2) < 4)
+			return true;
+
+		return false;
+
+	}
+
+	bool rectControlRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, double rotate_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2, double rotate_v2){
+		cv::Point2f center_v2(center_x_v2, center_y_v2);
+		cv::RotatedRect rRect_v2 = cv::RotatedRect(center_v2, cv::Size2f(rect_width_v2, rect_height_v2), rotate_v2);
+		cv::Point2f vertices_v2[4];
+		rRect_v2.points(vertices_v2);
+
+		int inside = 0;
+		for (int i = 0; i < 4; i++)
+			if (pointInsideRotatedRect(center_x_v1, center_y_v1, rect_width_v1, rect_height_v1, rotate_v1, vertices_v2[i]))
+				inside++;
+		std::cout << "inside is " << inside << std::endl;
+		if (inside == 1)
+			return false;
+		else
+			return true;
+				
+	}
 }
