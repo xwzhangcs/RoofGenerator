@@ -18,7 +18,7 @@ cv::Mat RoofA::generateRoof(int width, int height, const Config& roof_paras, con
 		return cv::Mat();
 	if (roof_paras.center_y_ratio + roof_paras.roofWidth_ratio * roof_paras.roofAspect * 0.5 >= 1.0 || roof_paras.center_y_ratio < roof_paras.roofWidth_ratio * roof_paras.roofAspect * 0.5)
 		return cv::Mat();
-	int thickness = 2;
+
 	if (roof_paras.selected_roof_type == RoofTypes::FLAT){
 		DrawRotatedRect::generateRect(result, center_w, center_h, imageRoofWidth, imageRoofHeight, roof_paras.rotate, roof_paras.selected_roof_type, bg_color, fg_color);
 	}

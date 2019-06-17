@@ -76,11 +76,11 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 				if (utils::rectInsideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
 					return cv::Mat();
 
-				// special L or T
-				if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-					return cv::Mat();
-				if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
-					return cv::Mat();
+				//// special L or T
+				//if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
+				//	return cv::Mat();
+				//if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
+				//	return cv::Mat();
 			}
 		}
 	}
