@@ -27,18 +27,6 @@ int main(int argc, char** argv)
 	system("pause");
 
 	return 0;
-	/*Config roof_flat_paras(0.5, 0.2, 0.4, 0.5, -30, RoofTypes::FLAT, false, 0.0, 1.0);
-	cv::Mat roof_img = RoofA::generateRoof(224, 224, roof_flat_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
-	if (!roof_img.empty())
-		cv::imwrite("../data/roofA_flat.png", roof_img);
-	Config roof_gable_paras(0.3, 0.7, 0.4, 0.5, 30, RoofTypes::GABLE, true, 0.1, 1.0);
-	roof_img = RoofA::generateRoof(224, 224, roof_gable_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
-	if (!roof_img.empty())
-		cv::imwrite("../data/roofA_gable.png", roof_img);
-	Config roof_hip_paras(0.5, 0.5, 0.4, 0.5, 30, RoofTypes::HIP, true, 0.1, 0.6);
-	roof_img = RoofA::generateRoof(224, 224, roof_hip_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
-	if (!roof_img.empty())
-		cv::imwrite("../data/roofA_hip.png", roof_img);*/
 }
 
 // reduce the resolution to 56 * 56 
@@ -99,7 +87,10 @@ void test_two_nodes(int width, int height, int type){
 									if (roof_img_test_v2.empty()){
 										continue;
 									}
-									cv::Mat roof_img = RoofB::generateRoof(width, height, roof_flat_paras_v1, roof_flat_paras_v2, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
+									std::vector<Config> roof_paras;
+									roof_paras.push_back(roof_flat_paras_v1);
+									roof_paras.push_back(roof_flat_paras_v2);
+									cv::Mat roof_img = RoofB::generateRoof(width, height, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
 									if (!roof_img.empty()){
 										char buffer[50];
 										sprintf(buffer, "roof_image_%08d.png", index);
@@ -166,7 +157,11 @@ void test_three_nodes(int width, int height, int type){
 														continue;
 													}
 
-													cv::Mat roof_img = RoofC::generateRoof(width, height, roof_flat_paras_v1, roof_flat_paras_v2, roof_flat_paras_v3, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
+													std::vector<Config> roof_paras;
+													roof_paras.push_back(roof_flat_paras_v1);
+													roof_paras.push_back(roof_flat_paras_v2);
+													roof_paras.push_back(roof_flat_paras_v3);
+													cv::Mat roof_img = RoofC::generateRoof(width, height, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
 													if (!roof_img.empty()){
 														char buffer[50];
 														sprintf(buffer, "roof_image_%08d.png", index);
