@@ -78,10 +78,10 @@ cv::Mat RoofC::generateRoof(int width, int height, const std::vector<Config>& ro
 						return cv::Mat();
 
 					// special L or T
-					if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
+					/*if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
 						return cv::Mat();
 					if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
-						return cv::Mat();
+						return cv::Mat();*/
 				}
 				else{
 					if (utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
@@ -96,26 +96,26 @@ cv::Mat RoofC::generateRoof(int width, int height, const std::vector<Config>& ro
 		for (int i = 0; i < roof_paras.size(); i++){
 			for (int j = i + 1; j < roof_paras.size(); j++){
 				if (i == 1 && j == 2){
-					if (utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-						return cv::Mat();
-					if (utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
+					int intersec_a = utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]);
+					int intersec_b = utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]);
+					if (intersec_a || intersec_b)
 						return cv::Mat();
 				}
 				else{
-					if (!utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-						return cv::Mat();
-					if (!utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
+					int intersec_a = !utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]);
+					int intersec_b = !utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]);
+					if (intersec_a && intersec_b)
 						return cv::Mat();
 					if (utils::rectInsideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
 						return cv::Mat();
 					if (utils::rectInsideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
 						return cv::Mat();
 
-					// special L or T
-					if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-						return cv::Mat();
-					if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
-						return cv::Mat();
+					//// special L or T
+					//if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
+					//	return cv::Mat();
+					//if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
+					//	return cv::Mat();
 				}
 			}
 		}

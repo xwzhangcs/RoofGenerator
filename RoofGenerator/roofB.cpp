@@ -67,9 +67,11 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 	{
 		for (int i = 0; i < roof_paras.size(); i++){
 			for (int j = i + 1; j < roof_paras.size(); j++){
-				if (!utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-					return cv::Mat();
-				if (!utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
+				//std::cout << center_w[i] << ", " << center_h[i] << ", " << ", " << imageRoofWidth[i] << ", " << imageRoofHeight[i] << ", " << rotate[i] << std::endl;
+				//std::cout << center_w[j] << ", " << center_h[j] << ", " << ", " << imageRoofWidth[j] << ", " << imageRoofHeight[j] << ", " << rotate[j] << std::endl;
+				int intersec_a = !utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]);
+				int intersec_b = !utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]);
+				if (intersec_a && intersec_b)
 					return cv::Mat();
 				if (utils::rectInsideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
 					return cv::Mat();

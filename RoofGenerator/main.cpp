@@ -18,8 +18,7 @@ int main(int argc, char** argv)
 {
 	//test_one_nodes(56, 56, 8);
 	test_two_nodes(56, 56, 8, 1);
-	//test_two_nodes(56, 56, 1);
-	//test_three_nodes(56, 56, 2);
+	//test_three_nodes(56, 56, 8, 2);
 	/*std::cout << utils::rectControlRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(24, 20, 26, 10, 0, 16, 32, 22, 13, 0) << std::endl;*/
@@ -57,6 +56,84 @@ void test_two_nodes(int width, int height, int step_size, int type){
 	int index = 0;
 	int padding_size = 8;
 	double center_x_ratio = 0.5;
+	double roof_w_ratio = width * 1.0 / (width + padding_size);
+	double roof_start_ratio = (0.2 * width) / (width + padding_size);
+	double step_aspect_ratio = step_size * 1.0 / (roof_w_ratio * (width + padding_size));
+	double step_ratio = step_size * 1.0 / (width + padding_size);
+
+	for (double aspect_ratio = 0.25; aspect_ratio <= 4; aspect_ratio += step_aspect_ratio){
+		for (double center_y_ratio = padding_size * 0.5 / (height + padding_size); center_y_ratio <= 0.5; center_y_ratio += step_ratio){
+			Config roof_flat_paras(center_x_ratio, center_y_ratio, roof_w_ratio, aspect_ratio, 0, RoofTypes::FLAT, false, 0.0, 1.0);
+			cv::Mat roof_img_test = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
+			if (roof_img_test.empty()){
+				continue;
+			}
+			// add the second rectangle
+			for (double roof_w_ratio_v1 = roof_start_ratio; roof_w_ratio_v1 < 1.0; roof_w_ratio_v1 += step_ratio){
+				double step_aspect_ratio_v1 = step_size * 1.0 / (roof_w_ratio_v1 * (width + padding_size));
+				for (double aspect_ratio_v1 = 0.25; aspect_ratio_v1 < 4; aspect_ratio_v1 += step_aspect_ratio_v1){
+					for (double center_x_ratio_v1 = padding_size * 0.5 / (width + padding_size); center_x_ratio_v1 <= 0.5; center_x_ratio_v1 += step_ratio){
+						for (double center_y_ratio_v1 = padding_size * 0.5 / (height + padding_size); center_y_ratio_v1 <= 1.0; center_y_ratio_v1 += step_ratio){							
+							if (aspect_ratio_v1 * roof_w_ratio_v1 > height * 1.0 / (height + padding_size) || aspect_ratio_v1 * roof_w_ratio_v1 < roof_start_ratio)
+								continue;
+							// valid height_v1
+							double top_y_ratio_v1 = center_y_ratio_v1 - 0.5 * roof_w_ratio_v1 * aspect_ratio_v1;
+							double bot_y_ratio_v1 = center_y_ratio_v1 + 0.5 * roof_w_ratio_v1 * aspect_ratio_v1;
+							double top_y_ratio = center_y_ratio - 0.5 * roof_w_ratio * aspect_ratio;
+							double bot_y_ratio = center_y_ratio + 0.5 * roof_w_ratio * aspect_ratio;
+							if ((top_y_ratio_v1 > top_y_ratio && top_y_ratio_v1 < bot_y_ratio) || (bot_y_ratio_v1 > top_y_ratio && bot_y_ratio_v1 < bot_y_ratio))
+								continue;
+							Config roof_flat_paras_v1(center_x_ratio_v1, center_y_ratio_v1, roof_w_ratio_v1, aspect_ratio_v1, 0, RoofTypes::FLAT, false, 0.0, 1.0);
+							cv::Mat roof_img_test_v1 = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras_v1, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
+							if (roof_img_test_v1.empty()){
+								continue;
+							}
+							bool bCrossType = false;
+							if (abs(top_y_ratio_v1 - bot_y_ratio) < step_ratio)
+								roof_flat_paras_v1.center_y_ratio = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
+							if (abs(top_y_ratio_v1 - top_y_ratio) < step_ratio)
+								roof_flat_paras_v1.center_y_ratio = center_y_ratio - 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
+							
+
+							if (top_y_ratio_v1 <= top_y_ratio && bot_y_ratio_v1 >= bot_y_ratio)
+								bCrossType = true;
+							if (bCrossType){
+								if (aspect_ratio_v1 * roof_w_ratio_v1 - aspect_ratio * roof_w_ratio < 2 * step_ratio)
+									continue;
+								if (abs(top_y_ratio_v1 - (1 - bot_y_ratio_v1)) > step_ratio)
+									continue;
+							}
+							else{
+								if (abs(top_y_ratio_v1 - bot_y_ratio) < step_ratio)
+									roof_flat_paras_v1.center_y_ratio = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
+								if (abs(top_y_ratio - (1 - bot_y_ratio_v1)) > step_ratio)
+									continue;
+							}
+							std::vector<Config> roof_paras;
+							roof_paras.push_back(roof_flat_paras);
+							roof_paras.push_back(roof_flat_paras_v1);
+							cv::Mat roof_img = RoofB::generateRoof(width + padding_size, height + padding_size, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
+							if (!roof_img.empty()){
+								char buffer[50];
+								sprintf(buffer, "roof_image_%08d.png", index);
+								std::string img_filename = "../data/node_two/" + std::string(buffer);
+								std::cout << img_filename << std::endl;
+								cv::imwrite(img_filename, roof_img);
+								index++;
+							}
+						}
+					}
+				}
+			}
+			
+		}
+	}
+}
+
+void test_three_nodes(int width, int height, int step_size, int type){
+	int index = 0;
+	int padding_size = 8;
+	double center_x_ratio = 0.5;
 	double center_y_ratio = 0.5;
 	double roof_w_ratio = width * 1.0 / (width + padding_size);
 	double roof_start_ratio = (0.2 * width) / (width + padding_size);
@@ -72,64 +149,58 @@ void test_two_nodes(int width, int height, int step_size, int type){
 		}
 		// add the second rectangle
 		double step_ratio = step_size * 1.0 / (width + padding_size);
-		// cross type
-		for (double dis_ratio = 0.0; dis_ratio <= 0.5; dis_ratio += step_ratio){
-			for (double roof_w_ratio_v1 = roof_start_ratio; roof_w_ratio_v1 < 1.0; roof_w_ratio_v1 += step_ratio){
-				double step_aspect_ratio_v1 = step_size * 1.0 / (roof_w_ratio_v1 * (width + padding_size));
-				for (double aspect_ratio_v1 = 0.25; aspect_ratio_v1 < 4; aspect_ratio_v1 += step_aspect_ratio_v1){
-					if (aspect_ratio_v1 * roof_w_ratio_v1 > height * 1.0 / (height + padding_size) || aspect_ratio_v1 * roof_w_ratio_v1 < roof_start_ratio)
-						continue;
-					if (aspect_ratio_v1 * roof_w_ratio_v1 - aspect_ratio * roof_w_ratio < 2 * step_ratio)
-						continue;
-					double center_x_ratio_v1 = center_x_ratio - 0.5 * roof_w_ratio + dis_ratio + 0.5 * roof_w_ratio_v1;
-					//double center_y_ratio_v1 = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
-					double center_y_ratio_v1 = center_y_ratio;
-					Config roof_flat_paras_v1(center_x_ratio_v1, center_y_ratio_v1, roof_w_ratio_v1, aspect_ratio_v1, 0, RoofTypes::FLAT, false, 0.0, 1.0);
-					cv::Mat roof_img_test_v1 = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras_v1, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
-					if (roof_img_test_v1.empty()){
-						continue;
-					}
-					std::vector<Config> roof_paras;
-					roof_paras.push_back(roof_flat_paras);
-					roof_paras.push_back(roof_flat_paras_v1);
-					cv::Mat roof_img = RoofB::generateRoof(width + padding_size, height + padding_size, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
-					if (!roof_img.empty()){
-						char buffer[50];
-						sprintf(buffer, "roof_image_%08d.png", index);
-						std::string img_filename = "../data/node_two/" + std::string(buffer);
-						std::cout << img_filename << std::endl;
-						cv::imwrite(img_filename, roof_img);
-						index++;
-					}
-				}
-			}
-		}
+		for (double roof_w_ratio_v1 = roof_start_ratio; roof_w_ratio_v1 < 1.0; roof_w_ratio_v1 += step_ratio){
+			double step_aspect_ratio_v1 = step_size * 1.0 / (roof_w_ratio_v1 * (width + padding_size));
+			for (double aspect_ratio_v1 = 0.25; aspect_ratio_v1 < 4; aspect_ratio_v1 += step_aspect_ratio_v1){
+				for (int choice_v1 = 0; choice_v1 <= 1; choice_v1++){
+					for (int choice_v2 = 0; choice_v2 <= 1; choice_v2++){
+						if (aspect_ratio_v1 * roof_w_ratio_v1 > height * 1.0 / (height + padding_size) || aspect_ratio_v1 * roof_w_ratio_v1 < roof_start_ratio)
+							continue;
+						if (choice_v1 == 0){
+							if (aspect_ratio_v1 * roof_w_ratio_v1 - aspect_ratio * roof_w_ratio < 2 * step_ratio)
+								continue;
+						}
+						double center_x_ratio_v1 = center_x_ratio - 0.5 * roof_w_ratio + 0.5 * roof_w_ratio_v1;
+						double center_x_ratio_v2 = center_x_ratio + 0.5 * roof_w_ratio - 0.5 * roof_w_ratio_v1;
+						double center_y_ratio_v1 = 0.0f;
+						double center_y_ratio_v2 = 0.0f;
+						if (choice_v1 == 0){
+							center_y_ratio_v1 = center_y_ratio;
+							center_y_ratio_v2 = center_y_ratio;
+						}
+						else{
+							center_y_ratio_v1 = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
+							if (choice_v2 == 0)
+								center_y_ratio_v2 = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
+							else{
+								center_y_ratio_v2 = center_y_ratio - 0.5 * (roof_w_ratio * aspect_ratio) - 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1) + 0.01;
+							}
+						}
 
-		// T or L shape
-		for (double dis_ratio = 0.0; dis_ratio <= 0.5; dis_ratio += step_ratio){
-			for (double roof_w_ratio_v1 = roof_start_ratio; roof_w_ratio_v1 < 1.0; roof_w_ratio_v1 += step_ratio){
-				double step_aspect_ratio_v1 = step_size * 1.0 / (roof_w_ratio_v1 * (width + padding_size));
-				for (double aspect_ratio_v1 = 0.25; aspect_ratio_v1 < 4; aspect_ratio_v1 += step_aspect_ratio_v1){
-					if (aspect_ratio_v1 * roof_w_ratio_v1 > height * 1.0 / (height + padding_size) || aspect_ratio_v1 * roof_w_ratio_v1 < roof_start_ratio)
-						continue;
-					double center_x_ratio_v1 = center_x_ratio - 0.5 * roof_w_ratio + dis_ratio + 0.5 * roof_w_ratio_v1;
-					double center_y_ratio_v1 = center_y_ratio + 0.5 * (roof_w_ratio * aspect_ratio) + 0.5 * (roof_w_ratio_v1 * aspect_ratio_v1);
-					Config roof_flat_paras_v1(center_x_ratio_v1, center_y_ratio_v1, roof_w_ratio_v1, aspect_ratio_v1, 0, RoofTypes::FLAT, false, 0.0, 1.0);
-					cv::Mat roof_img_test_v1 = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras_v1, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
-					if (roof_img_test_v1.empty()){
-						continue;
-					}
-					std::vector<Config> roof_paras;
-					roof_paras.push_back(roof_flat_paras);
-					roof_paras.push_back(roof_flat_paras_v1);
-					cv::Mat roof_img = RoofB::generateRoof(width + padding_size, height + padding_size, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
-					if (!roof_img.empty()){
-						char buffer[50];
-						sprintf(buffer, "roof_image_%08d.png", index);
-						std::string img_filename = "../data/node_two/" + std::string(buffer);
-						std::cout << img_filename << std::endl;
-						cv::imwrite(img_filename, roof_img);
-						index++;
+						Config roof_flat_paras_v1(center_x_ratio_v1, center_y_ratio_v1, roof_w_ratio_v1, aspect_ratio_v1, 0, RoofTypes::FLAT, false, 0.0, 1.0);
+						cv::Mat roof_img_test_v1 = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras_v1, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
+						if (roof_img_test_v1.empty()){
+							continue;
+						}
+						Config roof_flat_paras_v2(center_x_ratio_v2, center_y_ratio_v2, roof_w_ratio_v1, aspect_ratio_v1, 0, RoofTypes::FLAT, false, 0.0, 1.0);
+						cv::Mat roof_img_test_v2 = RoofA::generateRoof(width + padding_size, height + padding_size, roof_flat_paras_v2, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
+						if (roof_img_test_v2.empty()){
+							continue;
+						}
+						std::vector<Config> roof_paras;
+						roof_paras.push_back(roof_flat_paras);
+						roof_paras.push_back(roof_flat_paras_v1);
+						roof_paras.push_back(roof_flat_paras_v2);
+						cv::Mat roof_img = RoofC::generateRoof(width + padding_size, height + padding_size, roof_paras, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255), type, false);
+						if (!roof_img.empty()){
+							char buffer[50];
+							sprintf(buffer, "roof_image_%08d.png", index);
+							std::string img_filename = "../data/node_three/" + std::string(buffer);
+							std::cout << img_filename << std::endl;
+							cv::imwrite(img_filename, roof_img);
+							index++;
+						}
+
 					}
 				}
 			}
