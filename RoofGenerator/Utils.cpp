@@ -160,9 +160,9 @@ namespace utils {
 	}
 
 	bool pointInsideRect(int width, int height, cv::Point2f& pt){
-		if (pt.x <= 0 || pt.x >= width)
+		if (pt.x < 0 || pt.x > width)
 			return false;
-		if (pt.y <= 0 || pt.y > height)
+		if (pt.y < 0 || pt.y > height)
 			return false;
 		return true;
 	}
