@@ -14,7 +14,7 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 	fg_color_set.push_back(cv::Scalar(255, 0, 0)); // blue
 
 	for (int i = 0; i < roof_paras.size(); i++)
-		if (roof_paras[i].roofAspect * roof_paras[i].roofWidth_ratio >= 1.0)
+		if (roof_paras[i].roofAspect * roof_paras[i].roofWidth_ratio > 1.0)
 			return cv::Mat();
 
 	cv::Mat result(height, width, CV_8UC3, bg_color);
@@ -54,14 +54,7 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 	// second check connectivity 
 	if (type == 0) // two independent nodes
 	{
-		for (int i = 0; i < roof_paras.size(); i++){
-			for (int j = i + 1; j < roof_paras.size(); j++){
-				if (utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-					return cv::Mat();
-				if (utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
-					return cv::Mat();
-			}
-		}
+		// don't consider for now
 	}
 	else if (type == 1) // connected
 	{
@@ -69,20 +62,14 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 			for (int j = i + 1; j < roof_paras.size(); j++){
 				//std::cout << center_w[i] << ", " << center_h[i] << ", " << ", " << imageRoofWidth[i] << ", " << imageRoofHeight[i] << ", " << rotate[i] << std::endl;
 				//std::cout << center_w[j] << ", " << center_h[j] << ", " << ", " << imageRoofWidth[j] << ", " << imageRoofHeight[j] << ", " << rotate[j] << std::endl;
-				int intersec_a = !utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]);
-				int intersec_b = !utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]);
+				bool intersec_a = !utils::rectIntersecRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]);
+				bool intersec_b = !utils::rectIntersecRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]);
 				if (intersec_a && intersec_b)
 					return cv::Mat();
 				if (utils::rectInsideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
 					return cv::Mat();
 				if (utils::rectInsideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
 					return cv::Mat();
-
-				//// special L or T
-				//if (!utils::rectSideBySideRect(center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j]))
-				//	return cv::Mat();
-				//if (!utils::rectSideBySideRect(center_w[j], center_h[j], imageRoofWidth[j], imageRoofHeight[j], rotate[j], center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i]))
-				//	return cv::Mat();
 			}
 		}
 	}
@@ -96,8 +83,7 @@ cv::Mat RoofB::generateRoof(int width, int height, const std::vector<Config>& ro
 			DrawRotatedRect::generateRect(result, padding, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, bg_color, fg_color_set[i]);
 		}
 		else if (roof_paras[i].selected_roof_type == RoofTypes::GABLE || roof_paras[i].selected_roof_type == RoofTypes::HIP){
-			int ridge_length = roof_paras[i].ridgeRatio * imageRoofWidth[i];
-			DrawRotatedRect::generateRect(result, padding, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, roof_paras[i].bRidgeDis, roof_paras[i].ridgeDisRatio, ridge_length, bg_color, fg_color_set[i]);
+			// don't consider for now
 		}
 		else{
 			// do nothing
