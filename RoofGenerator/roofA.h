@@ -11,5 +11,5 @@ protected:
 	RoofA() {}
 
 public:
-	static cv::Mat generateRoof(int width, int height, const Config& roof_paras, const cv::Scalar& bg_color, const cv::Scalar& fg_color);
+	static cv::Mat generateRoof(int width, int height, const Config& roof_paras, int padding, const cv::Scalar& bg_color, const cv::Scalar& fg_color);
 };

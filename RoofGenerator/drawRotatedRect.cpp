@@ -3,14 +3,17 @@
 #include "roofTypes.h"
 const float M_PI = 3.1415926535;
 
-void DrawRotatedRect::generateRect(cv::Mat & roof_img, int center_x, int center_y, int roofWidth, int roofHeight, double rotate, int selected_roof_type, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
+void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x, int center_y, int roofWidth, int roofHeight, double rotate, int selected_roof_type, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
 	int imageRoofWidth = roofWidth;
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;
 	int center_h = center_y;
 	int thickness = 1;
+	int width = roof_img.size().width + padding * 2;
+	int height = roof_img.size().height + padding * 2;
+	cv::resize(roof_img, roof_img, cv::Size(width, height));
 	if (selected_roof_type == RoofTypes::FLAT){
-		cv::Point2f center(center_w, center_h);
+		cv::Point2f center(center_w + padding, center_h + padding);
 		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), rotate);
 		cv::Point2f vertices[4];
 		rRect.points(vertices);
@@ -23,7 +26,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int center_x, int center_
 	}
 }
 
-void DrawRotatedRect::generateRect(cv::Mat & roof_img, int center_x, int center_y, int roofWidth, int roofHeight, double rotate, int selected_roof_type, bool bRidgeDis, double ridgeDisRatio, int ridgeLength, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
+void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x, int center_y, int roofWidth, int roofHeight, double rotate, int selected_roof_type, bool bRidgeDis, double ridgeDisRatio, int ridgeLength, const cv::Scalar& bg_color, const cv::Scalar& fg_color){
 	int imageRoofWidth = roofWidth;
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;

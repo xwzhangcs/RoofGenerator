@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "roofTypes.h"
 
-cv::Mat RoofC::generateRoof(int width, int height, const std::vector<Config>& roof_paras, const cv::Scalar& bg_color, const cv::Scalar& fg_color, int type, bool bDebug){
+cv::Mat RoofC::generateRoof(int width, int height, const std::vector<Config>& roof_paras, int padding, const cv::Scalar& bg_color, const cv::Scalar& fg_color, int type, bool bDebug){
 	std::vector<cv::Scalar> fg_color_set; // bgr
 	fg_color_set.push_back(cv::Scalar(0, 0, 255)); // red
 	fg_color_set.push_back(cv::Scalar(0, 255, 0)); // green
@@ -148,11 +148,11 @@ cv::Mat RoofC::generateRoof(int width, int height, const std::vector<Config>& ro
 	int thickness = 2;
 	for (int i = 0; i < roof_paras.size(); i++){
 		if (roof_paras[i].selected_roof_type == RoofTypes::FLAT){
-			DrawRotatedRect::generateRect(result, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, bg_color, fg_color_set[i]);
+			DrawRotatedRect::generateRect(result, padding, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, bg_color, fg_color_set[i]);
 		}
 		else if (roof_paras[i].selected_roof_type == RoofTypes::GABLE || roof_paras[i].selected_roof_type == RoofTypes::HIP){
 			int ridge_length = roof_paras[i].ridgeRatio * imageRoofWidth[i];
-			DrawRotatedRect::generateRect(result, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, roof_paras[i].bRidgeDis, roof_paras[i].ridgeDisRatio, ridge_length, bg_color, fg_color_set[i]);
+			DrawRotatedRect::generateRect(result, padding, center_w[i], center_h[i], imageRoofWidth[i], imageRoofHeight[i], rotate[i], roof_paras[i].selected_roof_type, roof_paras[i].bRidgeDis, roof_paras[i].ridgeDisRatio, ridge_length, bg_color, fg_color_set[i]);
 		}
 		else{
 			// do nothing

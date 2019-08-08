@@ -11,5 +11,5 @@ protected:
 	RoofD() {}
 
 public:
-	static cv::Mat generateRoof(int width, int height, const std::vector<Config>& roof_paras, const cv::Scalar& bg_color, const cv::Scalar& fg_color, int type, bool bDebug);
+	static cv::Mat generateRoof(int width, int height, const std::vector<Config>& roof_paras, int padding, const cv::Scalar& bg_color, const cv::Scalar& fg_color, int type, bool bDebug);
 };
