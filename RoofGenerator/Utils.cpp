@@ -159,6 +159,16 @@ namespace utils {
 		return true;
 	}
 
+	bool rectInsideRect(int width, int height, int center_x, int center_y, int rect_width, int rect_height){
+		cv::Point l1(center_x - 0.5 * rect_width, center_y - 0.5 * rect_height);
+		cv::Point r1(center_x + 0.5 * rect_width, center_y + 0.5 * rect_height);
+		if (l1.x < 0 || l1.y < 0)
+			return false;
+		if (r1.x > width || r1.y > height)
+			return false;
+		return true;
+	}
+
 	bool pointInsideRect(int width, int height, cv::Point2f& pt){
 		if (pt.x < 0 || pt.x > width)
 			return false;
@@ -175,6 +185,30 @@ namespace utils {
 					return true;
 			}
 		}
+		return false;
+	}
+
+	bool rectIntersecRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2){
+		cv::Point l1(center_x_v1 - 0.5 * rect_width_v1, center_y_v1 - 0.5 * rect_height_v1);
+		cv::Point r1(center_x_v1 + 0.5 * rect_width_v1, center_y_v1 + 0.5 * rect_height_v1);
+		cv::Point l2(center_x_v2 - 0.5 * rect_width_v2, center_y_v2 - 0.5 * rect_height_v2);
+		cv::Point r2(center_x_v2 + 0.5 * rect_width_v2, center_y_v2 + 0.5 * rect_height_v2);
+		// If one rectangle is on left side of other 
+		if (l1.x > r2.x || l2.x > r1.x)
+			return false;
+
+		// If one rectangle is above other 
+		if (l1.y > r2.y || l2.y > r1.y)
+			return false;
+
+		return true;
+	}
+
+	bool rectTouch(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		if (top_w_v1 == bot_w_v2 || bot_w_v1 == top_w_v2)
+			return true;
+		if (top_h_v1 == bot_h_v2 || bot_h_v1 == top_h_v2)
+			return true;
 		return false;
 	}
 
