@@ -10,12 +10,30 @@
 #include "Utils.h"
 #include "drawRotatedRect.h"
 
+
+#include <boost/config.hpp>
+#include <boost/graph/graph_utility.hpp>
+#include <boost/graph/connected_components.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/properties.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/graphviz.hpp>
+
+
 void test_one_nodes(int width, int height, int step_size, int padding);
 void test_two_nodes(int width, int height, int step_size, int type, int padding);
 void test_three_nodes(int width, int height, int step_size, int type, int padding);
 void test_four_nodes(int width, int height, int step_size, int type, int padding);
 void test_four_nodes_c(int width, int height, int step_size, int type, int padding);
 void test_four_nodes_d(int width, int height, int step_size, int type, int padding);
+void test_bgl();
+void test_drawing();
+//a class to hold the coordinates of the straight line embedding
+struct coord_t
+{
+	std::size_t x;
+	std::size_t y;
+};
 
 int main(int argc, char** argv)
 {
@@ -24,13 +42,87 @@ int main(int argc, char** argv)
 	//test_two_nodes(64, 64, 8, 1, padding);
 	//test_three_nodes(64, 64, 8, 1, padding);
 	//test_four_nodes(64, 64, 8, 1, padding);
-	test_four_nodes_d(64, 64, 8, 1, padding);
+	//test_four_nodes_d(64, 64, 8, 1, padding);
 	/*std::cout << utils::rectControlRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(24, 20, 26, 10, 0, 16, 32, 22, 13, 0) << std::endl;*/
+	test_drawing();
 	system("pause");
 
 	return 0;
+}
+void test_drawing(){
+	enum files_e {
+		dax_h, yow_h, boz_h, zow_h, foo_cpp,
+		foo_o, bar_cpp, bar_o, libfoobar_a,
+		zig_cpp, zig_o, zag_cpp, zag_o,
+		libzigzag_a, killerapp, N
+	};
+	const char* name[] = { "dax.h", "yow.h", "boz.h", "zow.h", "foo.cpp",
+		"foo.o", "bar.cpp", "bar.o", "libfoobar.a",
+		"zig.cpp", "zig.o", "zag.cpp", "zag.o",
+		"libzigzag.a", "killerapp" };
+	typedef std::pair<int, int> Edge;
+	Edge used_by[] = {
+		Edge(dax_h, foo_cpp), Edge(dax_h, bar_cpp), Edge(dax_h, yow_h),
+		Edge(yow_h, bar_cpp), Edge(yow_h, zag_cpp),
+		Edge(boz_h, bar_cpp), Edge(boz_h, zig_cpp), Edge(boz_h, zag_cpp),
+		Edge(zow_h, foo_cpp),
+		Edge(foo_cpp, foo_o),
+		Edge(foo_o, libfoobar_a),
+		Edge(bar_cpp, bar_o),
+		Edge(bar_o, libfoobar_a),
+		Edge(libfoobar_a, libzigzag_a),
+		Edge(zig_cpp, zig_o),
+		Edge(zig_o, libzigzag_a),
+		Edge(zag_cpp, zag_o),
+		Edge(zag_o, libzigzag_a),
+		Edge(libzigzag_a, killerapp)
+	};
+	const int nedges = sizeof(used_by) / sizeof(Edge);
+	int weights[nedges];
+	std::fill(weights, weights + nedges, 1);
+
+	using namespace boost;
+
+	typedef adjacency_list< vecS, vecS, directedS,
+		property< vertex_color_t, default_color_type >,
+		property< edge_weight_t, int >
+	> Graph;
+	Graph g(used_by, used_by + nedges, weights, N);
+
+	write_graphviz(std::cout, g, make_label_writer(name));
+}
+
+void test_bgl(){
+	enum { A, B, C, D, E, F, N };
+	const char* name = "ABCDEF";
+	typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+
+	Graph G;
+	add_edge(B, C, G);
+	add_edge(B, F, G);
+	add_edge(C, A, G);
+	add_edge(D, E, G);
+	add_edge(F, A, G);
+
+	std::vector<int> component(num_vertices(G));
+	int num = connected_components(G, &component[0]);
+
+	std::vector<int>::size_type i;
+	std::cout << "Total number of components: " << num << std::endl;
+
+	std::cout << "vertex set: ";
+	boost::print_vertices(G, name);
+	std::cout << std::endl;
+
+	std::cout << "edge set: ";
+	boost::print_edges(G, name);
+	std::cout << std::endl;
+
+	std::cout << "incident edges: " << std::endl;
+	boost::print_graph(G, name);
+	std::cout << std::endl;
 }
 
 // reduce the resolution to 56 * 56 
