@@ -18,7 +18,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/graphviz.hpp>
-
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 void test_one_nodes(int width, int height, int step_size, int padding);
 void test_two_nodes(int width, int height, int step_size, int type, int padding);
@@ -26,8 +27,11 @@ void test_three_nodes(int width, int height, int step_size, int type, int paddin
 void test_four_nodes(int width, int height, int step_size, int type, int padding);
 void test_four_nodes_c(int width, int height, int step_size, int type, int padding);
 void test_four_nodes_d(int width, int height, int step_size, int type, int padding);
-void test_bgl();
+void test_bgl(int num_nodes);
 void test_drawing();
+void findCombinationsUtil(int arr[], int index, int num, int reducedNum, int nodes);
+std::vector<int> DecimalToBinary(int n, int num_digits);
+
 //a class to hold the coordinates of the straight line embedding
 struct coord_t
 {
@@ -37,7 +41,7 @@ struct coord_t
 
 int main(int argc, char** argv)
 {
-	int padding = 5;
+	//int padding = 5;
 	//test_one_nodes(64, 64, 8, padding);
 	//test_two_nodes(64, 64, 8, 1, padding);
 	//test_three_nodes(64, 64, 8, 1, padding);
@@ -46,11 +50,27 @@ int main(int argc, char** argv)
 	/*std::cout << utils::rectControlRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(24, 20, 26, 10, 0, 16, 32, 22, 13, 0) << std::endl;*/
-	test_drawing();
+	test_bgl(atoi(argv[1]));
 	system("pause");
 
 	return 0;
 }
+
+std::vector<int> DecimalToBinary(int n, int num_digits) {
+	std::vector<int> binaryNumber;
+	if (pow(2, num_digits) <= n)
+		return binaryNumber;
+	binaryNumber.resize(num_digits);
+	int num = n;
+	int i = num_digits - 1;
+	while (n > 0 && i >=0 ) {
+		binaryNumber[i] = n % 2;
+		n = n / 2;
+		i--;
+	}
+	return binaryNumber;
+}
+
 void test_drawing(){
 	enum files_e {
 		dax_h, yow_h, boz_h, zow_h, foo_cpp,
@@ -94,35 +114,140 @@ void test_drawing(){
 	write_graphviz(std::cout, g, make_label_writer(name));
 }
 
-void test_bgl(){
-	enum { A, B, C, D, E, F, N };
-	const char* name = "ABCDEF";
-	typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+void findCombinationsUtil(int arr[], int index,
+	int num, int reducedNum, int nodes)
+{
+	// Base condition 
+	if (reducedNum < 0)
+		return;
 
-	Graph G;
-	add_edge(B, C, G);
-	add_edge(B, F, G);
-	add_edge(C, A, G);
-	add_edge(D, E, G);
-	add_edge(F, A, G);
+	// If combination is found, print it 
+	if (reducedNum == 0)
+	{
+		if (index == nodes){
+			for (int i = 0; i < index; i++)
+				std::cout << arr[i] << " ";
+			std::cout << std::endl;
+		}
+		return;
+	}
 
-	std::vector<int> component(num_vertices(G));
-	int num = connected_components(G, &component[0]);
+	// Find the previous number stored in arr[] 
+	// It helps in maintaining increasing order 
+	int prev = (index == 0) ? 1 : arr[index - 1];
 
-	std::vector<int>::size_type i;
-	std::cout << "Total number of components: " << num << std::endl;
+	// note loop starts from previous number 
+	// i.e. at array location index - 1 
+	for (int k = prev; k <= num; k++)
+	{
+		// next element of array is k 
+		arr[index] = k;
+		// call recursively with reduced number 
+		findCombinationsUtil(arr, index + 1, num,
+			reducedNum - k, nodes);
+	}
+}
 
-	std::cout << "vertex set: ";
-	boost::print_vertices(G, name);
-	std::cout << std::endl;
-
-	std::cout << "edge set: ";
-	boost::print_edges(G, name);
-	std::cout << std::endl;
-
-	std::cout << "incident edges: " << std::endl;
-	boost::print_graph(G, name);
-	std::cout << std::endl;
+void test_bgl(int num_nodes){
+	boost::numeric::ublas::matrix<int> m(num_nodes, num_nodes, 0);
+	int numb_edges = num_nodes * (num_nodes - 1) / 2;
+	int num_cases = pow(2, numb_edges);
+	int num_connected = 0;
+	std::vector<int> degrees;
+	degrees.resize(num_nodes);
+	std::vector<std::vector<int>> results_degrees;
+	std::vector<int> results_index;
+	// assignment
+	for (int c = 0; c < num_cases; c++){
+		std::vector<int> values = DecimalToBinary(c, numb_edges);
+		typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+		Graph G(num_nodes);
+		int index_e = 0;
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = i + 1; j < m.size2(); j++){
+				m(i, j) = values[index_e];
+				if (m(i, j) == 1){
+					add_edge(i, j, G);
+				}
+				index_e++;
+			}
+		}
+		bool bConnected = false;
+		// check connectivity
+		std::vector<int> component(num_vertices(G));
+		int num = connected_components(G, &component[0]);
+		if (num == 1 && m(0, 1) == 1){
+			bConnected = true;
+			num_connected++;
+		}
+		if (bConnected){
+			//std::cout << "------------------" << std::endl;
+			// generate undirected graph mat
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < i; j++){
+					m(i, j) = m(j, i);
+				}
+			}
+			// compute degrees
+			for (int i = 0; i < m.size1(); i++){
+				degrees[i] = 0;
+				for (int j = 0; j < m.size2(); j++){
+					if (m(i, j) == 1)
+						degrees[i]++;
+				}
+				//std::cout << degrees[i] << " ";
+			}
+			//std::cout << std::endl;
+			std::sort(degrees.begin(), degrees.end());
+			bool bNew = true;
+			for (int i = 0; i < results_degrees.size(); i++){
+				if (results_degrees[i] == degrees){
+					bNew = false;
+					break;
+				}
+			}
+			if (bNew){
+				results_degrees.push_back(degrees);
+				results_index.push_back(c);
+			}
+			//// display mat
+			//for (int i = 0; i < m.size1(); i++){
+			//	for (int j = 0; j < m.size2(); j++){
+			//		std::cout << m(i, j);
+			//		if (j < m.size2() - 1)
+			//			std::cout << ",";
+			//	}
+			//	std::cout << std::endl;
+			//}
+		}
+	}
+	for (int i = 0; i < results_index.size(); i++){
+		std::vector<int> values = DecimalToBinary(results_index[i], numb_edges);
+		int index_e = 0;
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = i + 1; j < m.size2(); j++){
+				m(i, j) = values[index_e];
+				index_e++;
+			}
+		}
+		// generate undirected graph mat
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < i; j++){
+				m(i, j) = m(j, i);
+			}
+		}
+		std::cout << "------------------" << std::endl;
+		// display mat
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < m.size2(); j++){
+				std::cout << m(i, j);
+				if (j < m.size2() - 1)
+					std::cout << ",";
+			}
+			std::cout << std::endl;
+		}
+	}
+	std::cout << "The number of types is " << results_index.size() << std::endl;
 }
 
 // reduce the resolution to 56 * 56 
