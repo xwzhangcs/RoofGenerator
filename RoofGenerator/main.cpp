@@ -18,7 +18,9 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <boost/graph/isomorphism.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 void test_one_nodes(int width, int height, int step_size, int padding);
@@ -38,6 +40,11 @@ struct coord_t
 	std::size_t x;
 	std::size_t y;
 };
+void print_vector(std::vector<int> v){
+	for (int i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+}
 
 int main(int argc, char** argv)
 {
@@ -153,9 +160,9 @@ void test_bgl(int num_nodes){
 	int numb_edges = num_nodes * (num_nodes - 1) / 2;
 	int num_cases = pow(2, numb_edges);
 	int num_connected = 0;
-	std::vector<int> degrees;
-	degrees.resize(num_nodes);
-	std::vector<std::vector<int>> results_degrees;
+	//std::vector<int> degrees;
+	//degrees.resize(num_nodes);
+	//std::vector<std::vector<int>> results_degrees;
 	std::vector<int> results_index;
 	// assignment
 	for (int c = 0; c < num_cases; c++){
@@ -176,49 +183,49 @@ void test_bgl(int num_nodes){
 		// check connectivity
 		std::vector<int> component(num_vertices(G));
 		int num = connected_components(G, &component[0]);
-		if (num == 1 && m(0, 1) == 1){
+		if (num == 1){
 			bConnected = true;
 			num_connected++;
 		}
 		if (bConnected){
 			//std::cout << "------------------" << std::endl;
 			// generate undirected graph mat
-			for (int i = 0; i < m.size1(); i++){
+			/*for (int i = 0; i < m.size1(); i++){
 				for (int j = 0; j < i; j++){
 					m(i, j) = m(j, i);
 				}
-			}
+			}*/
 			// compute degrees
-			for (int i = 0; i < m.size1(); i++){
+			/*for (int i = 0; i < m.size1(); i++){
 				degrees[i] = 0;
 				for (int j = 0; j < m.size2(); j++){
 					if (m(i, j) == 1)
 						degrees[i]++;
 				}
-				//std::cout << degrees[i] << " ";
-			}
-			//std::cout << std::endl;
-			std::sort(degrees.begin(), degrees.end());
+			}*/
 			bool bNew = true;
-			for (int i = 0; i < results_degrees.size(); i++){
-				if (results_degrees[i] == degrees){
+			for (int i = 0; i < results_index.size(); i++){
+				// g1
+				Graph g1(num_nodes);
+				int index_e = 0;
+				std::vector<int> values = DecimalToBinary(results_index[i], numb_edges);
+				for (int i = 0; i < m.size1(); i++){
+					for (int j = i + 1; j < m.size2(); j++){
+						m(i, j) = values[index_e];
+						if (m(i, j) == 1){
+							add_edge(i, j, g1);
+						}
+						index_e++;
+					}
+				}
+				if (boost::isomorphism(g1, G)){
 					bNew = false;
 					break;
 				}
 			}
 			if (bNew){
-				results_degrees.push_back(degrees);
 				results_index.push_back(c);
 			}
-			//// display mat
-			//for (int i = 0; i < m.size1(); i++){
-			//	for (int j = 0; j < m.size2(); j++){
-			//		std::cout << m(i, j);
-			//		if (j < m.size2() - 1)
-			//			std::cout << ",";
-			//	}
-			//	std::cout << std::endl;
-			//}
 		}
 	}
 	for (int i = 0; i < results_index.size(); i++){
