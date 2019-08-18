@@ -35,6 +35,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 	fg_color_set.push_back(cv::Scalar(128, 128, 128)); // grey
 	fg_color_set.push_back(cv::Scalar(255, 255, 0)); // cyan
 	fg_color_set.push_back(cv::Scalar(255, 0, 0)); // blue
+	fg_color_set.push_back(cv::Scalar(255, 255, 255)); // white
 	int thickness = 1;
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
@@ -49,9 +50,10 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), roof_paras[index][4]);
 			cv::Point2f vertices[4];
 			rRect.points(vertices);
-			// add sides
-			for (int i = 0; i < 4; i++)
-				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[index], thickness);
+			//// add sides
+			//for (int i = 0; i < 4; i++)
+			//	line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[index], thickness);
+			cv::rectangle(roof_img, vertices[1], vertices[3], fg_color_set[7], -1);
 		}
 	}
 	else{
