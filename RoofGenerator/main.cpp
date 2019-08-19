@@ -37,6 +37,7 @@ std::vector<int> DecimalToBinary(int n, int num_digits);
 void test_intersection(int width, int height, int step_size, int type, int padding);
 void test_tri_touch(int width, int height, int step_size, int type, int padding);
 bool test_triangle_circle(int num_nodes, int numb_edges, int c);
+void test_intersection_angle(int width, int height, int step_size, int type, int padding);
 
 //a class to hold the coordinates of the straight line embedding
 struct coord_t
@@ -75,8 +76,8 @@ int main(int argc, char** argv)
 	/*std::cout << utils::rectControlRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(24, 20, 26, 10, 0, 16, 32, 22, 13, 0) << std::endl;*/
-	//test_tri_touch(64, 64, 8, 1, padding);
-	test_bgl(atoi(argv[1]));
+	test_intersection_angle(64, 64, 8, 1, padding);
+	//test_bgl(atoi(argv[1]));
 	system("pause");
 
 	return 0;
@@ -406,6 +407,79 @@ void test_intersection(int width, int height, int step_size, int type, int paddi
 	}
 }
 
+void test_intersection_angle(int width, int height, int step_size, int type, int padding){
+	cv::Scalar bg_color(0, 0, 0);
+	cv::Scalar fg_color(0, 0, 255); // bgr
+	int index = 0;
+	int roof_min_size = 2 * step_size;
+	std::vector<std::vector<int>> roof_paras;
+	roof_paras.resize(2);
+	// first rectangle
+	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
+		for (int roof_h = roof_min_size; roof_h <= roof_w; roof_h += step_size){
+			for (int top_w = 0; top_w < width; top_w += step_size){
+				for (int top_h = 0; top_h < height; top_h += step_size){
+					int center_w = top_w + 0.5 * roof_w;
+					int center_h = top_h + 0.5 * roof_h;
+					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
+						continue;
+					// check 
+					// second rectangle
+					int roof_w_v1 = roof_w;
+					int roof_h_v1 = roof_h;
+					int top_w_v1 = top_w + roof_w;
+					int top_h_v1 = top_h;
+					int bottom_right_w_v1 = top_w_v1 + roof_w_v1;
+					int bottom_right_h_v1 = top_h_v1 + roof_h_v1;
+					int rotate_v1 = -30;
+					cv::Point2f top_left_v1(top_w_v1, top_h_v1);
+					cv::Point2f bottom_right_v1 = utils::RotatePoint(top_left_v1, cv::Point2f(bottom_right_w_v1, bottom_right_h_v1), (rotate_v1)* M_PI / 180.0);
+					cv::Point2f center((top_left_v1.x + bottom_right_v1.x) * 0.5, (top_left_v1.y + bottom_right_v1.y) * 0.5);
+
+					int center_w_v1 = center.x;
+					int center_h_v1 = center.y;
+					if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1, rotate_v1))
+						continue;
+					int dis_left = top_w < top_w_v1 ? top_w : top_w_v1;
+					int dis_right = (top_w + roof_w) > bottom_right_v1.x ? (width - top_w - roof_w) : (width - bottom_right_v1.x);
+					int dis_top = top_h < top_h_v1 ? top_h : top_h_v1;;
+					int dis_bot = (top_h + roof_h) > bottom_right_h_v1 ? (height - top_h - roof_h) : (height - bottom_right_h_v1);
+					// condition 2
+					/*if (dis_left != dis_right || dis_top != dis_bot)
+						continue;*/
+					// condition 3
+					/*if (dis_left * dis_top != 0)
+						continue;*/
+					// add first 
+					roof_paras[0].clear();
+					roof_paras[0].push_back(center_w);
+					roof_paras[0].push_back(center_h);
+					roof_paras[0].push_back(roof_w);
+					roof_paras[0].push_back(roof_h);
+					roof_paras[0].push_back(0);
+					// add second
+					roof_paras[1].clear();
+					roof_paras[1].push_back(center_w_v1);
+					roof_paras[1].push_back(center_h_v1);
+					roof_paras[1].push_back(roof_w_v1);
+					roof_paras[1].push_back(roof_h_v1);
+					roof_paras[1].push_back(rotate_v1);
+					//
+					cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+					DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+					if (!roof_img.empty()){
+						char buffer[50];
+						sprintf(buffer, "roof_image_%08d.png", index);
+						std::string img_filename = "../data/node_rotate/" + std::string(buffer);
+						std::cout << img_filename << std::endl;
+						cv::imwrite(img_filename, roof_img);
+						index++;
+					}
+				}
+			}
+		}
+	}
+}
 
 // reduce the resolution to 56 * 56 
 void test_one_nodes(int width, int height, int step_size, int padding){
