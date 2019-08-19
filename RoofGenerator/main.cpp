@@ -409,11 +409,12 @@ void test_intersection(int width, int height, int step_size, int type, int paddi
 
 void test_intersection_angle(int width, int height, int step_size, int type, int padding){
 	cv::Scalar bg_color(0, 0, 0);
-	cv::Scalar fg_color(0, 0, 255); // bgr
+	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = 0;
 	int roof_min_size = 2 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
+	int thickness = 1;
 	// first rectangle
 	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
 		for (int roof_h = roof_min_size; roof_h <= roof_w; roof_h += step_size){
@@ -423,8 +424,17 @@ void test_intersection_angle(int width, int height, int step_size, int type, int
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
-					// check 
-					// second rectangle
+
+					cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+					// add the first part
+					int top_left_w = top_w;
+					int top_left_h = top_h;
+					int bottom_right_w = top_left_w + roof_w;
+					int bottom_right_h = top_left_h + roof_h;
+					// add three sides
+					cv::line(roof_img, cv::Point(top_left_w, top_left_h), cv::Point(top_left_w, bottom_right_h), fg_color, thickness);
+					cv::line(roof_img, cv::Point(top_left_w, top_left_h), cv::Point(bottom_right_w, top_left_h), fg_color, thickness);
+					// add the second part
 					int roof_w_v1 = roof_w;
 					int roof_h_v1 = roof_h;
 					int top_w_v1 = top_w + roof_w;
@@ -435,38 +445,38 @@ void test_intersection_angle(int width, int height, int step_size, int type, int
 					cv::Point2f top_left_v1(top_w_v1, top_h_v1);
 					cv::Point2f bottom_right_v1 = utils::RotatePoint(top_left_v1, cv::Point2f(bottom_right_w_v1, bottom_right_h_v1), (rotate_v1)* M_PI / 180.0);
 					cv::Point2f center((top_left_v1.x + bottom_right_v1.x) * 0.5, (top_left_v1.y + bottom_right_v1.y) * 0.5);
-
 					int center_w_v1 = center.x;
 					int center_h_v1 = center.y;
 					if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1, rotate_v1))
 						continue;
-					int dis_left = top_w < top_w_v1 ? top_w : top_w_v1;
-					int dis_right = (top_w + roof_w) > bottom_right_v1.x ? (width - top_w - roof_w) : (width - bottom_right_v1.x);
-					int dis_top = top_h < top_h_v1 ? top_h : top_h_v1;;
-					int dis_bot = (top_h + roof_h) > bottom_right_h_v1 ? (height - top_h - roof_h) : (height - bottom_right_h_v1);
-					// condition 2
-					/*if (dis_left != dis_right || dis_top != dis_bot)
-						continue;*/
-					// condition 3
-					/*if (dis_left * dis_top != 0)
-						continue;*/
-					// add first 
-					roof_paras[0].clear();
-					roof_paras[0].push_back(center_w);
-					roof_paras[0].push_back(center_h);
-					roof_paras[0].push_back(roof_w);
-					roof_paras[0].push_back(roof_h);
-					roof_paras[0].push_back(0);
-					// add second
-					roof_paras[1].clear();
-					roof_paras[1].push_back(center_w_v1);
-					roof_paras[1].push_back(center_h_v1);
-					roof_paras[1].push_back(roof_w_v1);
-					roof_paras[1].push_back(roof_h_v1);
-					roof_paras[1].push_back(rotate_v1);
-					//
-					cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-					DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+					cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(roof_w_v1, roof_h_v1), rotate_v1);
+					cv::Point2f vertices[4];
+					rRect.points(vertices);
+					// add three sides
+					cv::line(roof_img, vertices[3], vertices[2], fg_color, thickness);
+					cv::line(roof_img, vertices[2], vertices[1], fg_color, thickness);
+					// compute the intersection
+					cv::Point2f int_pt;
+					double tab, tcd;
+					cv::Point2f left_v1(top_left_w, bottom_right_h);
+					cv::Point2f right_v1(bottom_right_w, bottom_right_h);
+					cv::Point2f left_v2 = vertices[0];
+					cv::Point2f right_v2 = vertices[3];
+
+					if (utils::lineLineIntersection(left_v1, right_v1, left_v2, right_v2, &tab, &tcd, false, int_pt)){
+						// add the common edge
+						cv::line(roof_img, int_pt, cv::Point(top_left_w, bottom_right_h), fg_color, thickness);
+						cv::line(roof_img, int_pt, vertices[3], fg_color, thickness);
+					}
+					else{
+						cv::line(roof_img, cv::Point(top_left_w, bottom_right_h), cv::Point(bottom_right_w, bottom_right_h), fg_color, thickness);
+						cv::line(roof_img, cv::Point(bottom_right_w, bottom_right_h), cv::Point(bottom_right_w, top_left_h), fg_color, thickness);
+						cv::line(roof_img, vertices[1], vertices[0], fg_color, thickness);
+						cv::line(roof_img, vertices[0], vertices[3], fg_color, thickness);
+						// remove the common edge
+						/*cv::line(roof_img, cv::Point(bottom_right_w_v1, bottom_right_h_v1 > bottom_right_h_v2 ? bottom_right_h_v2 - thickness : bottom_right_h_v1 - thickness),
+							cv::Point(bottom_right_w_v1, upper_left_h_v1 > upper_left_h_v2 ? upper_left_h_v1 + thickness : upper_left_h_v2 + thickness), bg_color, thickness);*/
+					}
 					if (!roof_img.empty()){
 						char buffer[50];
 						sprintf(buffer, "roof_image_%08d.png", index);
