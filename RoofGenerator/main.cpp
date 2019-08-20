@@ -31,6 +31,7 @@ void test_four_nodes(int width, int height, int step_size, int type, int padding
 void test_four_nodes_c(int width, int height, int step_size, int type, int padding);
 void test_four_nodes_d(int width, int height, int step_size, int type, int padding);
 void test_bgl(int num_nodes);
+void test_bgl_edges(int num_edges);
 void test_drawing();
 void findCombinationsUtil(int arr[], int index, int num, int reducedNum, int nodes);
 std::vector<int> DecimalToBinary(int n, int num_digits);
@@ -76,8 +77,8 @@ int main(int argc, char** argv)
 	/*std::cout << utils::rectControlRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(16, 32, 22, 13, 0, 24, 20, 26, 10, 0) << std::endl;
 	std::cout << utils::rectIntersecRect(24, 20, 26, 10, 0, 16, 32, 22, 13, 0) << std::endl;*/
-	test_intersection_angle(64, 64, 8, 1, padding);
-	//test_bgl(atoi(argv[1]));
+	//test_intersection_angle(64, 64, 8, 1, padding);
+	test_bgl_edges(atoi(argv[1]));
 	system("pause");
 
 	return 0;
@@ -291,6 +292,112 @@ void test_bgl(int num_nodes){
 			std::cout << std::endl;
 		}
 	}
+	std::cout << "The number of types is " << results_index.size() - num_cycles << " out of " << results_index.size() << std::endl;
+}
+
+void test_bgl_edges(int num_edges){
+	// find the range of the number of nodes
+	int min_nodes = sqrt(2 * num_edges);
+	int max_nodes = num_edges + 1;
+	std::vector<int> results_nodes;
+	std::vector<int> results_index;
+	for (int num_nodes = min_nodes; num_nodes <= max_nodes; num_nodes++){
+		boost::numeric::ublas::matrix<int> m(num_nodes, num_nodes, 0);
+		int max_num_edges = num_nodes * (num_nodes - 1) / 2;
+		int num_cases = pow(2, max_num_edges);
+		int num_connected = 0;
+		// assignment
+		for (int c = 0; c < num_cases; c++){
+			std::vector<int> values = DecimalToBinary(c, max_num_edges);
+			int valid_edges = 0;
+			for (int i = 0; i < values.size(); i++)
+				if (values[i] == 1)
+					valid_edges++;
+			if (valid_edges != num_edges)
+				continue;
+			typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+			Graph G(num_nodes);
+			int index_e = 0;
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = i + 1; j < m.size2(); j++){
+					m(i, j) = values[index_e];
+					if (m(i, j) == 1){
+						add_edge(i, j, G);
+					}
+					index_e++;
+				}
+			}
+			bool bConnected = false;
+			// check connectivity
+			std::vector<int> component(num_vertices(G));
+			int num = connected_components(G, &component[0]);
+			if (num == 1){
+				bConnected = true;
+				num_connected++;
+			}
+			if (bConnected){
+				bool bNew = true;
+				for (int i = 0; i < results_index.size(); i++){
+					// g1
+					Graph g1(num_nodes);
+					int index_e = 0;
+					std::vector<int> values = DecimalToBinary(results_index[i], max_num_edges);
+					for (int i = 0; i < m.size1(); i++){
+						for (int j = i + 1; j < m.size2(); j++){
+							m(i, j) = values[index_e];
+							if (m(i, j) == 1){
+								add_edge(i, j, g1);
+							}
+							index_e++;
+						}
+					}
+					if (boost::isomorphism(g1, G)){
+						bNew = false;
+						break;
+					}
+				}
+				if (bNew){
+					results_nodes.push_back(num_nodes);
+					results_index.push_back(c);
+				}
+			}
+		}
+	}
+	int num_cycles = 0;
+	for (int i = 0; i < results_index.size(); i++){
+		boost::numeric::ublas::matrix<int> m(results_nodes[i], results_nodes[i], 0);
+		int max_num_edges = results_nodes[i] * (results_nodes[i] - 1) / 2;
+		// check triangle cycles
+		if (test_triangle_circle(results_nodes[i], max_num_edges, results_index[i])){
+			num_cycles++;
+			continue;
+		}
+		std::vector<int> values = DecimalToBinary(results_index[i], max_num_edges);
+		int index_e = 0;
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = i + 1; j < m.size2(); j++){
+				m(i, j) = values[index_e];
+				index_e++;
+			}
+		}
+		// generate undirected graph mat
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < i; j++){
+				m(i, j) = m(j, i);
+			}
+		}
+		std::cout << "------------------" << std::endl;
+		// display mat
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < m.size2(); j++){
+				std::cout << m(i, j);
+				if (j < m.size2() - 1)
+					std::cout << ",";
+			}
+			std::cout << std::endl;
+		}
+	}
+	//std::cout << "The number of types is " <<  results_index.size() << std::endl;
 	std::cout << "The number of types is " << results_index.size() - num_cycles << " out of " << results_index.size() << std::endl;
 }
 
