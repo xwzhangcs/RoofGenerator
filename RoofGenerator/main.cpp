@@ -56,7 +56,7 @@ void test_one_nodes(int width, int height, int step_size, int padding){
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
 					cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-					DrawRotatedRect::generateRect(roof_img, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::HIP, false, 0, roof_w > roof_h? roof_w * 0.8: roof_h * 0.8, bg_color, fg_color);
+					DrawRotatedRect::generateRect(roof_img, true, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::HIP, false, 0, roof_w > roof_h? roof_w * 0.8: roof_h * 0.8, bg_color, fg_color);
 					if (!roof_img.empty()){
 						char buffer[50];
 						sprintf(buffer, "roof_image_%08d.png", index);
@@ -73,7 +73,7 @@ void test_one_nodes(int width, int height, int step_size, int padding){
 
 void test_two_nodes(int width, int height, int step_size, int type, int padding){
 	cv::Scalar bg_color(0, 0, 0);
-	cv::Scalar fg_color(0, 0, 255); // bgr
+	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = 0;
 	int roof_min_size = 2 * step_size;
 	std::vector<std::vector<int>> roof_paras;
@@ -118,23 +118,10 @@ void test_two_nodes(int width, int height, int step_size, int type, int padding)
 									// condition 3
 									if (dis_left * dis_top != 0)
 										continue;
-									// add first 
-									roof_paras[0].clear();
-									roof_paras[0].push_back(center_w);
-									roof_paras[0].push_back(center_h);
-									roof_paras[0].push_back(roof_w);
-									roof_paras[0].push_back(roof_h);
-									roof_paras[0].push_back(0);
-									// add second
-									roof_paras[1].clear();
-									roof_paras[1].push_back(center_w_v1);
-									roof_paras[1].push_back(center_h_v1);
-									roof_paras[1].push_back(roof_w_v1);
-									roof_paras[1].push_back(roof_h_v1);
-									roof_paras[1].push_back(0);
 									//
 									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-									DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+									DrawRotatedRect::generateRect(roof_img, true, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::GABLE, false, 0, roof_w > roof_h ? roof_w: roof_h, bg_color, fg_color);
+									DrawRotatedRect::generateRect(roof_img, false, padding, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1, 0, RoofTypes::GABLE, false, 0, roof_w_v1 > roof_h_v1 ? roof_w_v1 : roof_h_v1, bg_color, fg_color);
 									if (!roof_img.empty()){
 										char buffer[50];
 										sprintf(buffer, "roof_image_%08d.png", index);
