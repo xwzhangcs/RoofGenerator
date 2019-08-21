@@ -122,6 +122,7 @@ void test_two_nodes(int width, int height, int step_size, int type, int padding)
 									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 									DrawRotatedRect::generateRect(roof_img, true, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::GABLE, false, 0, roof_w > roof_h ? roof_w: roof_h, bg_color, fg_color);
 									DrawRotatedRect::generateRect(roof_img, false, padding, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1, 0, RoofTypes::GABLE, false, 0, roof_w_v1 > roof_h_v1 ? roof_w_v1 : roof_h_v1, bg_color, fg_color);
+									// remove the common edges
 									if (!roof_img.empty()){
 										char buffer[50];
 										sprintf(buffer, "roof_image_%08d.png", index);
