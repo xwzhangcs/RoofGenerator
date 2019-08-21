@@ -4,6 +4,15 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <boost/config.hpp>
+#include <boost/graph/graph_utility.hpp>
+#include <boost/graph/connected_components.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/isomorphism.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
 namespace utils {
 
 	double genRand();
@@ -31,5 +40,13 @@ namespace utils {
 	bool rectControlRect(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, double rotate_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2, double rotate_v2);
 	bool rectTouch(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2);
 	bool rectTouch_v1(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2);
+	bool relation_L(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2);
+	bool relation_T(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2);
+	bool relation_I(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2);
 	bool rectCross(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2);
+
+	std::vector<int> DecimalToBinary(int n, int num_digits);
+	bool test_triangle_circle(int num_nodes, int numb_edges, int c);
+	void test_bgl(int num_nodes);
+	void test_bgl_edges(int num_edges);
 }

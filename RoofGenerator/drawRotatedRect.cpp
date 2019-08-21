@@ -67,9 +67,12 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x
 	int center_w = center_x;
 	int center_h = center_y;
 	int thickness = 1;
+	int width = roof_img.size().width + padding * 2;
+	int height = roof_img.size().height + padding * 2;
+	cv::resize(roof_img, roof_img, cv::Size(width, height));
 	if (selected_roof_type == RoofTypes::GABLE || selected_roof_type == RoofTypes::HIP){
 		// draw rect
-		cv::Point2f center(center_w, center_h);
+		cv::Point2f center(center_w + padding, center_h + padding);
 		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), rotate);
 		cv::Point2f vertices[4];
 		rRect.points(vertices);
@@ -78,10 +81,10 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x
 			line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color, thickness);
 		// add ridge
 		int ridge_length = ridgeLength;
-		int ridge_x1 = center_w - ridge_length * 0.5;
-		int ridge_y1 = center_h;
-		int ridge_x2 = ridge_x1 + ridge_length;
-		int ridge_y2 = center_h;
+		int ridge_x1 = roofWidth > roofHeight ? center.x - ridge_length * 0.5 : center.x;
+		int ridge_y1 = roofWidth > roofHeight ? center.y : center.y - ridge_length * 0.5;
+		int ridge_x2 = roofWidth > roofHeight ? ridge_x1 + ridge_length : center.x;
+		int ridge_y2 = roofWidth > roofHeight ? center.y : ridge_y1 + ridge_length;
 		if (bRidgeDis) {
 			ridge_y1 += utils::genRand(-imageRoofHeight * ridgeDisRatio, imageRoofHeight * ridgeDisRatio);
 			ridge_y2 += utils::genRand(-imageRoofHeight * ridgeDisRatio, imageRoofHeight * ridgeDisRatio);
@@ -92,9 +95,9 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x
 		if (selected_roof_type == RoofTypes::HIP)
 		{
 			// connect other roof edges
-			cv::line(roof_img, vertices[0], ridge_left, fg_color, thickness);
+			cv::line(roof_img, roofWidth > roofHeight ? vertices[0] : vertices[2], ridge_left, fg_color, thickness);
 			cv::line(roof_img, vertices[1], ridge_left, fg_color, thickness);
-			cv::line(roof_img, vertices[2], ridge_right, fg_color, thickness);
+			cv::line(roof_img, roofWidth > roofHeight ? vertices[2] : vertices[0], ridge_right, fg_color, thickness);
 			cv::line(roof_img, vertices[3], ridge_right, fg_color, thickness);
 		}
 	}

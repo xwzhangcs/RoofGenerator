@@ -232,6 +232,36 @@ namespace utils {
 		return false;
 	}
 
+	/* v1 is the main and v2 is the second*/
+	bool relation_L(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		// check direction
+		bool bDir_v1 = (bot_w_v1 - top_w_v1) > (bot_h_v1 - top_h_v1) ? true : false;
+		bool bDir_v2 = (bot_w_v2 - top_w_v2) > (bot_h_v2 - top_h_v2) ? true : false;
+		if (bDir_v1 == bDir_v2)
+			return false;
+		if ((top_w_v2 == top_w_v1 && bot_w_v2 < bot_w_v1) || (bot_w_v2 == bot_w_v1 && top_w_v2 > top_w_v1)){
+			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && bot_h_v2 > bot_h_v1)
+				return true;
+			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && top_h_v2 < top_h_v1)
+				return true;
+		}
+		if ((top_h_v2 == top_h_v1 && bot_h_v2 < bot_h_v1) || (bot_h_v2 == bot_h_v1 && top_h_v2 > top_h_v1)){
+			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && bot_w_v2 > bot_w_v1)
+				return true;
+			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && top_w_v2 < top_w_v1)
+				return true;
+		}
+		return false;
+	}
+
+	bool relation_T(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		return false;
+	}
+
+	bool relation_I(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		return false;
+	}
+
 	bool rectCross(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2){
 		cv::Point l1(center_x_v1 - 0.5 * rect_width_v1, center_y_v1 - 0.5 * rect_height_v1);
 		cv::Point r1(center_x_v1 + 0.5 * rect_width_v1, center_y_v1 + 0.5 * rect_height_v1);
@@ -345,4 +375,273 @@ namespace utils {
 			return true;
 				
 	}
+
+	std::vector<int> DecimalToBinary(int n, int num_digits) {
+		std::vector<int> binaryNumber;
+		if (pow(2, num_digits) <= n)
+			return binaryNumber;
+		binaryNumber.resize(num_digits);
+		int num = n;
+		int i = num_digits - 1;
+		while (n > 0 && i >= 0) {
+			binaryNumber[i] = n % 2;
+			n = n / 2;
+			i--;
+		}
+		return binaryNumber;
+	}
+
+	bool test_triangle_circle(int num_nodes, int numb_edges, int c){
+		boost::numeric::ublas::matrix<int> m(num_nodes, num_nodes, 0);
+		std::vector<int> values = DecimalToBinary(c, numb_edges);
+		int index_e = 0;
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = i + 1; j < m.size2(); j++){
+				m(i, j) = values[index_e];
+				index_e++;
+			}
+		}
+		// complete m
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < i; j++){
+				m(i, j) = m(j, i);
+			}
+		}
+		for (int i = 0; i < m.size1(); i++){
+			for (int j = 0; j < m.size2(); j++){
+				for (int k = 0; k < m.size2(); k++){
+					if (m(i, j) == 1 && m(j, k) == 1 && m(k, i) == 1){ // i -> j, j -> k and k -> i 
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	void test_bgl(int num_nodes){
+		boost::numeric::ublas::matrix<int> m(num_nodes, num_nodes, 0);
+		int numb_edges = num_nodes * (num_nodes - 1) / 2;
+		int num_cases = pow(2, numb_edges);
+		int num_connected = 0;
+		//std::vector<int> degrees;
+		//degrees.resize(num_nodes);
+		//std::vector<std::vector<int>> results_degrees;
+		std::vector<int> results_index;
+		// assignment
+		int num_test = 0;
+		for (int c = 0; c < num_cases; c++){
+			num_test++;
+			std::cout << "num_test is " << num_test << std::endl;
+			std::vector<int> values = DecimalToBinary(c, numb_edges);
+			int valid_edges = 0;
+			for (int i = 0; i < values.size(); i++)
+				if (values[i] == 1)
+					valid_edges++;
+			if (valid_edges < num_nodes - 1)
+				continue;
+			typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+			Graph G(num_nodes);
+			int index_e = 0;
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = i + 1; j < m.size2(); j++){
+					m(i, j) = values[index_e];
+					if (m(i, j) == 1){
+						add_edge(i, j, G);
+					}
+					index_e++;
+				}
+			}
+			bool bConnected = false;
+			// check connectivity
+			std::vector<int> component(num_vertices(G));
+			int num = connected_components(G, &component[0]);
+			if (num == 1){
+				bConnected = true;
+				num_connected++;
+			}
+			if (bConnected){
+				//std::cout << "------------------" << std::endl;
+				// generate undirected graph mat
+				/*for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < i; j++){
+				m(i, j) = m(j, i);
+				}
+				}*/
+				// compute degrees
+				/*for (int i = 0; i < m.size1(); i++){
+				degrees[i] = 0;
+				for (int j = 0; j < m.size2(); j++){
+				if (m(i, j) == 1)
+				degrees[i]++;
+				}
+				}*/
+				bool bNew = true;
+				for (int i = 0; i < results_index.size(); i++){
+					// g1
+					Graph g1(num_nodes);
+					int index_e = 0;
+					std::vector<int> values = DecimalToBinary(results_index[i], numb_edges);
+					for (int i = 0; i < m.size1(); i++){
+						for (int j = i + 1; j < m.size2(); j++){
+							m(i, j) = values[index_e];
+							if (m(i, j) == 1){
+								add_edge(i, j, g1);
+							}
+							index_e++;
+						}
+					}
+					if (boost::isomorphism(g1, G)){
+						bNew = false;
+						break;
+					}
+				}
+				if (bNew){
+					results_index.push_back(c);
+				}
+			}
+		}
+		std::wcout << "here" << std::endl;
+		int num_cycles = 0;
+		for (int i = 0; i < results_index.size(); i++){
+			// check triangle cycles
+			if (test_triangle_circle(num_nodes, numb_edges, results_index[i])){
+				num_cycles++;
+				continue;
+			}
+
+			std::vector<int> values = DecimalToBinary(results_index[i], numb_edges);
+			int index_e = 0;
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = i + 1; j < m.size2(); j++){
+					m(i, j) = values[index_e];
+					index_e++;
+				}
+			}
+			// generate undirected graph mat
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < i; j++){
+					m(i, j) = m(j, i);
+				}
+			}
+			std::cout << "------------------" << std::endl;
+			// display mat
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < m.size2(); j++){
+					std::cout << m(i, j);
+					if (j < m.size2() - 1)
+						std::cout << ",";
+				}
+				std::cout << std::endl;
+			}
+		}
+		std::cout << "The number of types is " << results_index.size() - num_cycles << " out of " << results_index.size() << std::endl;
+	}
+
+	void test_bgl_edges(int num_edges){
+		// find the range of the number of nodes
+		int min_nodes = sqrt(2 * num_edges);
+		int max_nodes = num_edges + 1;
+		std::vector<int> results_nodes;
+		std::vector<int> results_index;
+		for (int num_nodes = min_nodes; num_nodes <= max_nodes; num_nodes++){
+			boost::numeric::ublas::matrix<int> m(num_nodes, num_nodes, 0);
+			int max_num_edges = num_nodes * (num_nodes - 1) / 2;
+			int num_cases = pow(2, max_num_edges);
+			int num_connected = 0;
+			// assignment
+			for (int c = 0; c < num_cases; c++){
+				std::vector<int> values = DecimalToBinary(c, max_num_edges);
+				int valid_edges = 0;
+				for (int i = 0; i < values.size(); i++)
+					if (values[i] == 1)
+						valid_edges++;
+				if (valid_edges != num_edges)
+					continue;
+				typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
+				Graph G(num_nodes);
+				int index_e = 0;
+				for (int i = 0; i < m.size1(); i++){
+					for (int j = i + 1; j < m.size2(); j++){
+						m(i, j) = values[index_e];
+						if (m(i, j) == 1){
+							add_edge(i, j, G);
+						}
+						index_e++;
+					}
+				}
+				bool bConnected = false;
+				// check connectivity
+				std::vector<int> component(num_vertices(G));
+				int num = connected_components(G, &component[0]);
+				if (num == 1){
+					bConnected = true;
+					num_connected++;
+				}
+				if (bConnected){
+					bool bNew = true;
+					for (int i = 0; i < results_index.size(); i++){
+						// g1
+						Graph g1(num_nodes);
+						int index_e = 0;
+						std::vector<int> values = DecimalToBinary(results_index[i], max_num_edges);
+						for (int i = 0; i < m.size1(); i++){
+							for (int j = i + 1; j < m.size2(); j++){
+								m(i, j) = values[index_e];
+								if (m(i, j) == 1){
+									add_edge(i, j, g1);
+								}
+								index_e++;
+							}
+						}
+						if (boost::isomorphism(g1, G)){
+							bNew = false;
+							break;
+						}
+					}
+					if (bNew){
+						results_nodes.push_back(num_nodes);
+						results_index.push_back(c);
+					}
+				}
+			}
+		}
+		int num_cycles = 0;
+		for (int i = 0; i < results_index.size(); i++){
+			boost::numeric::ublas::matrix<int> m(results_nodes[i], results_nodes[i], 0);
+			int max_num_edges = results_nodes[i] * (results_nodes[i] - 1) / 2;
+			// check triangle cycles
+			if (test_triangle_circle(results_nodes[i], max_num_edges, results_index[i])){
+				num_cycles++;
+				continue;
+			}
+			std::vector<int> values = DecimalToBinary(results_index[i], max_num_edges);
+			int index_e = 0;
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = i + 1; j < m.size2(); j++){
+					m(i, j) = values[index_e];
+					index_e++;
+				}
+			}
+			// generate undirected graph mat
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < i; j++){
+					m(i, j) = m(j, i);
+				}
+			}
+			std::cout << "------------------" << std::endl;
+			// display mat
+			for (int i = 0; i < m.size1(); i++){
+				for (int j = 0; j < m.size2(); j++){
+					std::cout << m(i, j);
+					if (j < m.size2() - 1)
+						std::cout << ",";
+				}
+				std::cout << std::endl;
+			}
+		}
+		//std::cout << "The number of types is " <<  results_index.size() << std::endl;
+		std::cout << "The number of types is " << results_index.size() - num_cycles << " out of " << results_index.size() << std::endl;
+	}
+
 }
