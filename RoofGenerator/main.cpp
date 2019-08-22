@@ -119,10 +119,24 @@ void test_two_nodes(int width, int height, int step_size, int type, int padding)
 									if (dis_left * dis_top != 0)
 										continue;
 									//
+									// add first 
+									roof_paras[0].clear();
+									roof_paras[0].push_back(center_w);
+									roof_paras[0].push_back(center_h);
+									roof_paras[0].push_back(roof_w);
+									roof_paras[0].push_back(roof_h);
+									roof_paras[0].push_back(0);
+									roof_paras[0].push_back(roof_w > roof_h ? roof_w : roof_h);
+									// add second
+									roof_paras[1].clear();
+									roof_paras[1].push_back(center_w_v1);
+									roof_paras[1].push_back(center_h_v1);
+									roof_paras[1].push_back(roof_w_v1);
+									roof_paras[1].push_back(roof_h_v1);
+									roof_paras[1].push_back(0);
+									roof_paras[1].push_back(roof_w_v1 > roof_h_v1 ? roof_w_v1 : roof_h_v1);
 									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-									DrawRotatedRect::generateRect(roof_img, true, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::GABLE, false, 0, roof_w > roof_h ? roof_w: roof_h, bg_color, fg_color);
-									DrawRotatedRect::generateRect(roof_img, false, padding, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1, 0, RoofTypes::GABLE, false, 0, roof_w_v1 > roof_h_v1 ? roof_w_v1 : roof_h_v1, bg_color, fg_color);
-									// remove the common edges
+									DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofRelationship::L, RoofTypes::GABLE, bg_color, fg_color);
 									if (!roof_img.empty()){
 										char buffer[50];
 										sprintf(buffer, "roof_image_%08d.png", index);

@@ -254,6 +254,97 @@ namespace utils {
 		return false;
 	}
 
+	int rectSub_L(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) || bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) || top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) || bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1))
+			return 1;
+		else
+			return 0;
+	}
+
+	// one vertex of v2 inside of v1
+	cv::Point vertInsideRect_L(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		int width = -1;
+		int height = -1;
+		if (top_w_v2 > top_w_v1 && top_w_v2 < bot_w_v1){
+			width = top_w_v2;
+		}
+		else if (bot_w_v2 > top_w_v1 && bot_w_v2 < bot_w_v1){
+			width = bot_w_v2;
+		}
+		else{
+
+		}
+		if (top_h_v2 > top_h_v1 && top_h_v2 < bot_h_v1){
+			height = top_h_v2;
+		}
+		else if (bot_h_v2 > top_h_v1 && bot_h_v2 < bot_h_v1){
+			height = bot_h_v2;
+		}
+		else{
+
+		}
+		return cv::Point(width, height);
+	}
+
+	// one vertex of v1 on the edge of v2
+	cv::Point vertOnRect_L(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		int width = -1;
+		int height = -1;
+		if (top_w_v2 == top_w_v1){
+			width = top_w_v1;
+			if (top_h_v1 > top_h_v2 && top_h_v1 < bot_h_v2){
+				height = top_h_v1;
+			}
+			else if (bot_h_v1 > top_h_v2 && bot_h_v1 < bot_h_v2){
+				height = bot_h_v1;
+			}
+			else{
+
+			}
+			return cv::Point(width, height);
+		}
+		if (bot_w_v2 == bot_w_v1){
+			width = top_w_v2;
+			if (top_h_v1 > top_h_v2 && top_h_v1 < bot_h_v2){
+				height = top_h_v1;
+			}
+			else if (bot_h_v1 > top_h_v2 && bot_h_v1 < bot_h_v2){
+				height = bot_h_v1;
+			}
+			else{
+
+			}
+			return cv::Point(width, height);
+		}
+		if (top_h_v2 == top_h_v1){
+			height = top_h_v1;
+			if (top_w_v1 > top_w_v2 && top_w_v1 < bot_w_v2){
+				width = top_w_v1;
+			}
+			else if (bot_w_v1 > top_w_v2 && bot_w_v1 < bot_w_v2){
+				width = bot_w_v1;
+			}
+			else{
+
+			}
+			return cv::Point(width, height);
+		}
+		if (bot_h_v2 == bot_h_v1){
+			height = bot_h_v1;
+			if (top_w_v1 > top_w_v2 && top_w_v1 < bot_w_v2){
+				width = top_w_v1;
+			}
+			else if (bot_w_v1 > top_w_v2 && bot_w_v1 < bot_w_v2){
+				width = bot_w_v1;
+			}
+			else{
+
+			}
+			return cv::Point(width, height);
+		}
+		return cv::Point(width, height);
+	}
+
 	bool relation_T(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
 		return false;
 	}

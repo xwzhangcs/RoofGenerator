@@ -117,6 +117,52 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			cv::Point2f ridge_right = utils::RotatePoint(center, cv::Point2f(ridge_x2, ridge_y2), (rotate)* M_PI / 180.0);
 			cv::line(roof_img, ridge_left, ridge_right, fg_color, thickness);
 		}
+		// clean up edges
+		int top_w = roof_paras[0][0] - 0.5 * roof_paras[0][2] + padding;
+		int top_h = roof_paras[0][1] - 0.5 * roof_paras[0][3] + padding;
+		int bot_w = top_w + roof_paras[0][2];
+		int bot_h = top_h + roof_paras[0][3];
+		int top_w_v1 = roof_paras[1][0] - 0.5 * roof_paras[1][2] + padding;
+		int top_h_v1 = roof_paras[1][1] - 0.5 * roof_paras[1][3] + padding;
+		int bot_w_v1 = top_w_v1 + roof_paras[1][2];
+		int bot_h_v1 = top_h_v1 + roof_paras[1][3];
+		int index_sub = utils::rectSub_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+		// compute 2 critical points
+		if (index_sub == 1){
+			int imageRoofWidth = roof_paras[index_sub][2];
+			int imageRoofHeight = roof_paras[index_sub][3];
+			cv::Point point_1 = utils::vertInsideRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+			cv::Point point_2 = utils::vertOnRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+			cv::Point point_3, point_4;
+			if (imageRoofWidth > imageRoofHeight){
+				point_3.x = point_2.x;
+				point_3.y = point_1.y;
+				point_4.x = point_1.x;
+				point_4.y = point_2.y;
+			}
+			else{
+				point_3.x = point_1.x;
+				point_3.y = point_2.y;
+				point_4.x = point_2.x;
+				point_4.y = point_1.y;
+			}
+			/*std::cout << "point_1 is " << point_1 << std::endl;
+			std::cout << "point_2 is " << point_2 << std::endl;
+			std::cout << "point_3 is " << point_3 << std::endl;
+			std::cout << "point_4 is " << point_4 << std::endl;*/
+			cv::line(roof_img, point_1, point_3, bg_color, thickness);
+			cv::line(roof_img, point_2, point_3, bg_color, thickness);
+			cv::Point mid = 0.5 * (point_1 + point_4);
+			cv::line(roof_img, mid, point_2, fg_color, thickness);
+			cv::line(roof_img, mid, point_3, fg_color, thickness);
+			cv::line(roof_img, point_1, point_1, fg_color, thickness);
+			mid = 0.5 * (point_2 + point_3);
+			cv::line(roof_img, mid, mid, fg_color, thickness);
+		}
+		else{
+			std::cout << "here" << std::endl;
+		}
+
 	}
 	else if (selected_roof_type == RoofTypes::HIP){
 

@@ -4,3 +4,11 @@ enum RoofTypes
 	GABLE,
 	HIP
 };
+
+enum RoofRelationship
+{
+	I,
+	L,
+	T,
+	CROSS
+};
