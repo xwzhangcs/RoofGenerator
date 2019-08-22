@@ -304,7 +304,7 @@ namespace utils {
 			return cv::Point(width, height);
 		}
 		if (bot_w_v2 == bot_w_v1){
-			width = top_w_v2;
+			width = bot_w_v1;
 			if (top_h_v1 > top_h_v2 && top_h_v1 < bot_h_v2){
 				height = top_h_v1;
 			}
@@ -735,4 +735,9 @@ namespace utils {
 		std::cout << "The number of types is " << results_index.size() - num_cycles << " out of " << results_index.size() << std::endl;
 	}
 
+	void print_vector(std::vector<int> v){
+		for (int i = 0; i < v.size(); i++)
+			std::cout << v[i] << " ";
+		std::cout << std::endl;
+	}
 }

@@ -52,4 +52,5 @@ namespace utils {
 	bool test_triangle_circle(int num_nodes, int numb_edges, int c);
 	void test_bgl(int num_nodes);
 	void test_bgl_edges(int num_edges);
+	void print_vector(std::vector<int> v);
 }

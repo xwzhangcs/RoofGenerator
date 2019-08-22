@@ -75,23 +75,67 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
 	cv::resize(roof_img, roof_img, cv::Size(width, height));
-	if (selected_roof_type == RoofTypes::FLAT){
-		for (int index = 0; index < roof_paras.size(); index++){
-			int center_w = roof_paras[index][0];
-			int center_h = roof_paras[index][1];
-			int imageRoofWidth = roof_paras[index][2];
-			int imageRoofHeight = roof_paras[index][3];
-			cv::Point2f center(center_w + padding, center_h + padding);
-			cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), roof_paras[index][4]);
-			cv::Point2f vertices[4];
-			rRect.points(vertices);
-			//// add sides
-			for (int i = 0; i < 4; i++)
-				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[7], thickness);
-			//cv::rectangle(roof_img, vertices[1], vertices[3], fg_color_set[7], -1);
-		}
+
+	for (int index = 0; index < roof_paras.size(); index++){
+		int center_w = roof_paras[index][0];
+		int center_h = roof_paras[index][1];
+		int imageRoofWidth = roof_paras[index][2];
+		int imageRoofHeight = roof_paras[index][3];
+		cv::Point2f center(center_w + padding, center_h + padding);
+		cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), roof_paras[index][4]);
+		cv::Point2f vertices[4];
+		rRect.points(vertices);
+		//// add sides
+		for (int i = 0; i < 4; i++)
+			cv::line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[7], thickness);
 	}
-	else if (selected_roof_type == RoofTypes::GABLE){
+	// clean up edges
+	int top_w = roof_paras[0][0] - 0.5 * roof_paras[0][2] + padding;
+	int top_h = roof_paras[0][1] - 0.5 * roof_paras[0][3] + padding;
+	int bot_w = top_w + roof_paras[0][2];
+	int bot_h = top_h + roof_paras[0][3];
+	int top_w_v1 = roof_paras[1][0] - 0.5 * roof_paras[1][2] + padding;
+	int top_h_v1 = roof_paras[1][1] - 0.5 * roof_paras[1][3] + padding;
+	int bot_w_v1 = top_w_v1 + roof_paras[1][2];
+	int bot_h_v1 = top_h_v1 + roof_paras[1][3];
+	int index_sub = utils::rectSub_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+	cv::Point point_1, point_2, point_3, point_4;
+	// compute 2 critical points
+	if (index_sub == 1){
+		int imageRoofWidth = roof_paras[index_sub][2];
+		int imageRoofHeight = roof_paras[index_sub][3];
+		point_1 = utils::vertInsideRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+		point_2 = utils::vertOnRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+		if (imageRoofWidth > imageRoofHeight){
+			point_3.x = point_2.x;
+			point_3.y = point_1.y;
+			point_4.x = point_1.x;
+			point_4.y = point_2.y;
+		}
+		else{
+			point_3.x = point_1.x;
+			point_3.y = point_2.y;
+			point_4.x = point_2.x;
+			point_4.y = point_1.y;
+		}
+		/*std::cout << "point_1 is " << point_1 << std::endl;
+		std::cout << "point_2 is " << point_2 << std::endl;
+		std::cout << "point_3 is " << point_3 << std::endl;
+		std::cout << "point_4 is " << point_4 << std::endl;*/
+		cv::line(roof_img, point_1, point_3, bg_color, thickness);
+		cv::line(roof_img, point_1, point_4, bg_color, thickness);
+		cv::line(roof_img, point_2, point_3, bg_color, thickness);
+	}
+
+	if (selected_roof_type == RoofTypes::GABLE){
+		if (index_sub == 1){
+			cv::Point mid = 0.5 * (point_1 + point_4);
+			cv::line(roof_img, mid, point_2, fg_color, thickness);
+			cv::line(roof_img, mid, point_3, fg_color, thickness);
+		}
+		else{
+			//
+		}
 		for (int index = 0; index < roof_paras.size(); index++){
 			int center_w = roof_paras[index][0];
 			int center_h = roof_paras[index][1];
@@ -101,12 +145,6 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			int ridgeLength = roof_paras[index][5];
 			// draw rect
 			cv::Point2f center(center_w + padding, center_h + padding);
-			cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), rotate);
-			cv::Point2f vertices[4];
-			rRect.points(vertices);
-			// add sides
-			for (int i = 0; i < 4; i++)
-				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color, thickness);
 			// add ridge
 			int ridge_length = ridgeLength;
 			int ridge_x1 = imageRoofWidth > imageRoofHeight ? center.x - ridge_length * 0.5 : center.x;
@@ -117,55 +155,65 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			cv::Point2f ridge_right = utils::RotatePoint(center, cv::Point2f(ridge_x2, ridge_y2), (rotate)* M_PI / 180.0);
 			cv::line(roof_img, ridge_left, ridge_right, fg_color, thickness);
 		}
-		// clean up edges
-		int top_w = roof_paras[0][0] - 0.5 * roof_paras[0][2] + padding;
-		int top_h = roof_paras[0][1] - 0.5 * roof_paras[0][3] + padding;
-		int bot_w = top_w + roof_paras[0][2];
-		int bot_h = top_h + roof_paras[0][3];
-		int top_w_v1 = roof_paras[1][0] - 0.5 * roof_paras[1][2] + padding;
-		int top_h_v1 = roof_paras[1][1] - 0.5 * roof_paras[1][3] + padding;
-		int bot_w_v1 = top_w_v1 + roof_paras[1][2];
-		int bot_h_v1 = top_h_v1 + roof_paras[1][3];
-		int index_sub = utils::rectSub_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
-		// compute 2 critical points
+	}
+	else if (selected_roof_type == RoofTypes::HIP){
 		if (index_sub == 1){
-			int imageRoofWidth = roof_paras[index_sub][2];
-			int imageRoofHeight = roof_paras[index_sub][3];
-			cv::Point point_1 = utils::vertInsideRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
-			cv::Point point_2 = utils::vertOnRect_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
-			cv::Point point_3, point_4;
-			if (imageRoofWidth > imageRoofHeight){
-				point_3.x = point_2.x;
-				point_3.y = point_1.y;
-				point_4.x = point_1.x;
-				point_4.y = point_2.y;
-			}
-			else{
-				point_3.x = point_1.x;
-				point_3.y = point_2.y;
-				point_4.x = point_2.x;
-				point_4.y = point_1.y;
-			}
-			/*std::cout << "point_1 is " << point_1 << std::endl;
-			std::cout << "point_2 is " << point_2 << std::endl;
-			std::cout << "point_3 is " << point_3 << std::endl;
-			std::cout << "point_4 is " << point_4 << std::endl;*/
-			cv::line(roof_img, point_1, point_3, bg_color, thickness);
-			cv::line(roof_img, point_2, point_3, bg_color, thickness);
 			cv::Point mid = 0.5 * (point_1 + point_4);
 			cv::line(roof_img, mid, point_2, fg_color, thickness);
 			cv::line(roof_img, mid, point_3, fg_color, thickness);
-			cv::line(roof_img, point_1, point_1, fg_color, thickness);
-			mid = 0.5 * (point_2 + point_3);
-			cv::line(roof_img, mid, mid, fg_color, thickness);
 		}
-		else{
-			std::cout << "here" << std::endl;
+		for (int index = 0; index < roof_paras.size(); index++){
+			int center_w = roof_paras[index][0];
+			int center_h = roof_paras[index][1];
+			int imageRoofWidth = roof_paras[index][2];
+			int imageRoofHeight = roof_paras[index][3];
+			int rotate = roof_paras[index][4];
+			int ridgeLength = roof_paras[index][5];
+			// draw rect
+			cv::Point2f center(center_w + padding, center_h + padding);
+			cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), roof_paras[index][4]);
+			cv::Point2f vertices[4];
+			rRect.points(vertices);
+			// add ridge
+			int ridge_length = ridgeLength;
+			int ridge_x1 = imageRoofWidth > imageRoofHeight ? center.x - ridge_length * 0.5 : center.x;
+			int ridge_y1 = imageRoofWidth > imageRoofHeight ? center.y : center.y - ridge_length * 0.5;
+			int ridge_x2 = imageRoofWidth > imageRoofHeight ? ridge_x1 + ridge_length : center.x;
+			int ridge_y2 = imageRoofWidth > imageRoofHeight ? center.y : ridge_y1 + ridge_length;
+			cv::Point2f ridge_left = utils::RotatePoint(center, cv::Point2f(ridge_x1, ridge_y1), (rotate)* M_PI / 180.0);
+			cv::Point2f ridge_right = utils::RotatePoint(center, cv::Point2f(ridge_x2, ridge_y2), (rotate)* M_PI / 180.0);
+			cv::line(roof_img, ridge_left, ridge_right, fg_color, thickness);
+			if (imageRoofWidth > imageRoofHeight){
+				cv::line(roof_img, ridge_left, vertices[0], fg_color, thickness);
+				cv::line(roof_img, ridge_left, vertices[1], fg_color, thickness);
+				cv::line(roof_img, ridge_right, vertices[2], fg_color, thickness);
+				cv::line(roof_img, ridge_right, vertices[3], fg_color, thickness);
+				if (index == index_sub){
+					// clean up more
+					if (index_sub == 1){
+						cv::Point mid = 0.5 * (point_1 + point_4);
+						cv::line(roof_img, point_1, abs(ridge_left.x - mid.x) < abs(ridge_right.x - mid.x) ? ridge_left : ridge_right, bg_color, thickness);
+						cv::line(roof_img, point_4, abs(ridge_left.x - mid.x) < abs(ridge_right.x - mid.x) ? ridge_left : ridge_right, bg_color, thickness);
+						cv::line(roof_img, mid, abs(ridge_left.x - mid.x) < abs(ridge_right.x - mid.x) ? ridge_left : ridge_right, fg_color, thickness);
+					}
+				}
+			}
+			else{
+				cv::line(roof_img, ridge_left, vertices[1], fg_color, thickness);
+				cv::line(roof_img, ridge_left, vertices[2], fg_color, thickness);
+				cv::line(roof_img, ridge_right, vertices[0], fg_color, thickness);
+				cv::line(roof_img, ridge_right, vertices[3], fg_color, thickness);
+				if (index == index_sub){
+					// clean up more
+					if (index_sub == 1){
+						cv::Point mid = 0.5 * (point_1 + point_4);
+						cv::line(roof_img, point_1, abs(ridge_left.y - mid.y) < abs(ridge_right.y - mid.y) ? ridge_left : ridge_right, bg_color, thickness);
+						cv::line(roof_img, point_4, abs(ridge_left.y - mid.y) < abs(ridge_right.y - mid.y) ? ridge_left : ridge_right, bg_color, thickness);
+						cv::line(roof_img, mid, abs(ridge_left.y - mid.y) < abs(ridge_right.y - mid.y) ? ridge_left : ridge_right, fg_color, thickness);
+					}
+				}
+			}
 		}
-
-	}
-	else if (selected_roof_type == RoofTypes::HIP){
-
 	}
 	else{
 		// do nothing
