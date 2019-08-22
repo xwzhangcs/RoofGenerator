@@ -52,7 +52,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			rRect.points(vertices);
 			//// add sides
 			for (int i = 0; i < 4; i++)
-				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[7], thickness);
+				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[index], thickness);
 			//cv::rectangle(roof_img, vertices[1], vertices[3], fg_color_set[7], -1);
 		}
 	}

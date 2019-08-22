@@ -346,6 +346,23 @@ namespace utils {
 	}
 
 	bool relation_T(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		// check direction
+		bool bDir_v1 = (bot_w_v1 - top_w_v1) > (bot_h_v1 - top_h_v1) ? true : false;
+		bool bDir_v2 = (bot_w_v2 - top_w_v2) > (bot_h_v2 - top_h_v2) ? true : false;
+		if (bDir_v1 == bDir_v2)
+			return false;
+		if ((top_w_v2 > top_w_v1 && bot_w_v2 < bot_w_v1)){
+			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && bot_h_v2 > bot_h_v1)
+				return true;
+			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && top_h_v2 < top_h_v1)
+				return true;
+		}
+		if (top_h_v2 > top_h_v1 && bot_h_v2 < bot_h_v1){
+			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && bot_w_v2 > bot_w_v1)
+				return true;
+			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && top_w_v2 < top_w_v1)
+				return true;
+		}
 		return false;
 	}
 

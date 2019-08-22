@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="config.cpp" />
     <ClCompile Include="drawRotatedRect.cpp" />
+    <ClCompile Include="generator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="roofA.cpp" />
     <ClCompile Include="roofB.cpp" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="drawRotatedRect.h" />
+    <ClInclude Include="generator.h" />
     <ClInclude Include="print.h" />
     <ClInclude Include="roofA.h" />
     <ClInclude Include="roofB.h" />
