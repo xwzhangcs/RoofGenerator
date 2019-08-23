@@ -54,6 +54,35 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			/*for (int i = 0; i < 4; i++)
 				line(roof_img, vertices[i], vertices[(i + 1) % 4], fg_color_set[index], thickness);*/
 			cv::rectangle(roof_img, vertices[1], vertices[3], fg_color_set[7], -1);
+			// add noise
+
+			if (true)
+			{
+				float threshold = 0.50;
+				int kernel = 3;
+				// collect all points on the boundaries
+				std::vector<cv::Point> points;
+				for (int i = vertices[1].y; i <= vertices[0].y; i += 2 * kernel)
+					points.push_back(cv::Point(vertices[0].x, i));
+				for (int i = vertices[2].y; i <= vertices[3].y; i += 2 * kernel)
+					points.push_back(cv::Point(vertices[2].x, i));
+				for (int i = vertices[1].x; i <= vertices[2].x; i += 2 * kernel)
+					points.push_back(cv::Point(i, vertices[1].y));
+				for (int i = vertices[0].x; i <= vertices[3].x; i += 2 * kernel)
+					points.push_back(cv::Point(i, vertices[0].y));
+				for (int i = 0; i < points.size(); i++){
+					kernel = utils::genRand(1, 5);
+					if (utils::genRand(0.0, 1.0) > threshold){
+						if ((int)utils::genRand(0, 2)  % 2 == 0){
+							cv::circle(roof_img, points[i], kernel, cv::Scalar(255, 255, 255), -1);
+						}
+						else{
+							cv::circle(roof_img, points[i], kernel, cv::Scalar(0, 0, 0), -1);
+						}
+					}
+				}
+				cv::GaussianBlur(roof_img, roof_img, cv::Size(3, 3), 0, 0);
+			}
 		}
 	}
 	else{
