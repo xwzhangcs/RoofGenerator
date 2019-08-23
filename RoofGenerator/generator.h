@@ -11,8 +11,15 @@ protected:
 
 public:
 	static void generate_one_edge(int width, int height, int step_size, int padding, std::string output_path);
+
 	static void generate_two_edges(int width, int height, int step_size, int padding, std::string output_path);
+
 	static void generate_three_edges_v1(int width, int height, int step_size, int padding, std::string output_path);
 	static void generate_three_edges_v2(int width, int height, int step_size, int padding, std::string output_path);
+
+	static void generate_four_edges_v1(int width, int height, int step_size, int padding, std::string output_path);
+	static void generate_four_edges_v2(int width, int height, int step_size, int padding, std::string output_path);
+	static void generate_four_edges_v3(int width, int height, int step_size, int padding, std::string output_path);
+	static void generate_four_edges_v4(int width, int height, int step_size, int padding, std::string output_path);
 
 };

@@ -370,6 +370,37 @@ namespace utils {
 		return false;
 	}
 
+	bool relation_Cross(int top_w_v1, int top_h_v1, int bot_w_v1, int bot_h_v1, int top_w_v2, int top_h_v2, int bot_w_v2, int bot_h_v2){
+		bool bDir_v1 = (bot_w_v1 - top_w_v1) > (bot_h_v1 - top_h_v1) ? true : false;
+		bool bDir_v2 = (bot_w_v2 - top_w_v2) > (bot_h_v2 - top_h_v2) ? true : false;
+		if (!bDir_v1 || bDir_v2)
+			return false;
+		cv::Point l1(top_w_v1, top_h_v1);
+		cv::Point r1(bot_w_v1, bot_h_v1);
+		cv::Point l2(top_w_v2, top_h_v2);
+		cv::Point r2(bot_w_v2, bot_h_v2);
+		// If one rectangle is on left side of other 
+		if (l1.x > r2.x || l2.x > r1.x)
+			return false;
+		// If one rectangle is above other 
+		if (l1.y > r2.y || l2.y > r1.y)
+			return false;
+		if (l1.x < l2.x && r1.x > r2.x && l2.y < l1.y && r2.y > r1.y){
+			if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
+				return true;
+			else
+				return false;
+		}
+
+		if (l2.x < l1.x && r2.x > r1.x && l1.y < l2.y && r1.y > r2.y){
+			if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
+				return true;
+			else
+				return false;
+		}
+		return false;
+	}
+
 	bool rectCross(int center_x_v1, int center_y_v1, int rect_width_v1, int rect_height_v1, int center_x_v2, int center_y_v2, int rect_width_v2, int rect_height_v2){
 		cv::Point l1(center_x_v1 - 0.5 * rect_width_v1, center_y_v1 - 0.5 * rect_height_v1);
 		cv::Point r1(center_x_v1 + 0.5 * rect_width_v1, center_y_v1 + 0.5 * rect_height_v1);

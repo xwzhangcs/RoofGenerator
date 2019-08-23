@@ -11,7 +11,11 @@ int main(int argc, char** argv)
 	//Generator::generate_one_edge(200, 200, 20, padding, "../data/one_edge");
 	//Generator::generate_two_edges(200, 200, 20, padding, "../data/two_edges");
 	//Generator::generate_three_edges_v1(200, 200, 20, padding, "../data/three_edges_v1");
-	Generator::generate_three_edges_v2(200, 200, 20, padding, "../data/three_edges_v2");
+	//Generator::generate_three_edges_v2(200, 200, 20, padding, "../data/three_edges_v2");
+	//Generator::generate_four_edges_v2(200, 200, 20, padding, "../data/four_edges_v2");
+	//Generator::generate_four_edges_v1(200, 200, 20, padding, "../data/four_edges_v1");
+	//Generator::generate_four_edges_v3(200, 200, 20, padding, "../data/four_edges_v3");
+	Generator::generate_four_edges_v4(200, 200, 20, padding, "../data/four_edges_v4");
 	system("pause");
 
 	return 0;
