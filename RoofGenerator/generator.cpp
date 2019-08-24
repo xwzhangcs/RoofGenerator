@@ -37,27 +37,29 @@ int Generator::generate_one_edge(int start_index, int type, int total, int width
 					roof_paras[0].push_back(roof_w);
 					roof_paras[0].push_back(roof_h);
 					roof_paras[0].push_back(0);
-					cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-					DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-					if (!roof_img.empty()){
-						char buffer[50];
-						sprintf(buffer, "roof_image_%08d.png", index);
-						std::string img_filename = output_path + "/" + std::string(buffer);
-						std::cout << img_filename << std::endl;
-						cv::imwrite(img_filename, roof_img);
-						{
-							out_param << std::string(buffer);
-							for (int cluster = 0; cluster < total; cluster++){
-								out_param << ",";
-								if (cluster == type){
-									out_param << 1;
+					for (int iter = 0; iter < 100; iter++){
+						cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+						DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+						if (!roof_img.empty()){
+							char buffer[50];
+							sprintf(buffer, "roof_image_%06d.png", index);
+							std::string img_filename = output_path + "/" + std::string(buffer);
+							std::cout << img_filename << std::endl;
+							cv::imwrite(img_filename, roof_img);
+							{
+								out_param << std::string(buffer);
+								for (int cluster = 0; cluster < total; cluster++){
+									out_param << ",";
+									if (cluster == type){
+										out_param << 1;
+									}
+									else
+										out_param << 0;
 								}
-								else
-									out_param << 0;
+								out_param << "\n";
 							}
-							out_param << "\n";
+							index++;
 						}
-						index++;
 					}
 				}
 			}
@@ -129,27 +131,29 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-									DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-									if (!roof_img.empty()){
-										char buffer[50];
-										sprintf(buffer, "roof_image_%08d.png", index);
-										std::string img_filename = output_path + "/" + std::string(buffer);
-										std::cout << img_filename << std::endl;
-										cv::imwrite(img_filename, roof_img);
-										{
-											out_param << std::string(buffer);
-											for (int cluster = 0; cluster < total; cluster++){
-												out_param << ",";
-												if (cluster == type){
-													out_param << 1;
+									for (int iter = 0; iter < 1; iter++){
+										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+										if (!roof_img.empty()){
+											char buffer[50];
+											sprintf(buffer, "roof_image_%06d.png", index);
+											std::string img_filename = output_path + "/" + std::string(buffer);
+											std::cout << img_filename << std::endl;
+											cv::imwrite(img_filename, roof_img);
+											{
+												out_param << std::string(buffer);
+												for (int cluster = 0; cluster < total; cluster++){
+													out_param << ",";
+													if (cluster == type){
+														out_param << 1;
+													}
+													else
+														out_param << 0;
 												}
-												else
-													out_param << 0;
+												out_param << "\n";
 											}
-											out_param << "\n";
+											index++;
 										}
-										index++;
 									}
 								}
 							}
@@ -225,27 +229,29 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-									DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-									if (!roof_img.empty()){
-										char buffer[50];
-										sprintf(buffer, "roof_image_%08d.png", index);
-										std::string img_filename = output_path + "/" + std::string(buffer);
-										std::cout << img_filename << std::endl;
-										cv::imwrite(img_filename, roof_img);
-										{
-											out_param << std::string(buffer);
-											for (int cluster = 0; cluster < total; cluster++){
-												out_param << ",";
-												if (cluster == type){
-													out_param << 1;
+									for (int iter = 0; iter < 2; iter++){
+										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+										if (!roof_img.empty()){
+											char buffer[50];
+											sprintf(buffer, "roof_image_%06d.png", index);
+											std::string img_filename = output_path + "/" + std::string(buffer);
+											std::cout << img_filename << std::endl;
+											cv::imwrite(img_filename, roof_img);
+											{
+												out_param << std::string(buffer);
+												for (int cluster = 0; cluster < total; cluster++){
+													out_param << ",";
+													if (cluster == type){
+														out_param << 1;
+													}
+													else
+														out_param << 0;
 												}
-												else
-													out_param << 0;
+												out_param << "\n";
 											}
-											out_param << "\n";
+											index++;
 										}
-										index++;
 									}
 								}
 							}
@@ -383,27 +389,29 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 														continue;
 													if (dis_left * dis_top != 0)
 														continue;
-													cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-													DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-													if (!roof_img.empty()){
-														char buffer[50];
-														sprintf(buffer, "roof_image_%08d.png", index);
-														std::string img_filename = output_path + "/" + std::string(buffer);
-														std::cout << img_filename << std::endl;
-														cv::imwrite(img_filename, roof_img);
-														{
-															out_param << std::string(buffer);
-															for (int cluster = 0; cluster < total; cluster++){
-																out_param << ",";
-																if (cluster == type){
-																	out_param << 1;
+													for (int iter = 0; iter < 10; iter++){
+														cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+														DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+														if (!roof_img.empty()){
+															char buffer[50];
+															sprintf(buffer, "roof_image_%06d.png", index);
+															std::string img_filename = output_path + "/" + std::string(buffer);
+															std::cout << img_filename << std::endl;
+															cv::imwrite(img_filename, roof_img);
+															{
+																out_param << std::string(buffer);
+																for (int cluster = 0; cluster < total; cluster++){
+																	out_param << ",";
+																	if (cluster == type){
+																		out_param << 1;
+																	}
+																	else
+																		out_param << 0;
 																}
-																else
-																	out_param << 0;
+																out_param << "\n";
 															}
-															out_param << "\n";
+															index++;
 														}
-														index++;
 													}
 												}
 											}
@@ -571,28 +579,29 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 																		continue;
 																	if (dis_left * dis_top != 0)
 																		continue;
-
-																	cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-																	DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-																	if (!roof_img.empty()){
-																		char buffer[50];
-																		sprintf(buffer, "roof_image_%08d.png", index);
-																		std::string img_filename = output_path + "/" + std::string(buffer);
-																		std::cout << img_filename << std::endl;
-																		cv::imwrite(img_filename, roof_img);
-																		{
-																			out_param << std::string(buffer);
-																			for (int cluster = 0; cluster < total; cluster++){
-																				out_param << ",";
-																				if (cluster == type){
-																					out_param << 1;
+																	for (int iter = 0; iter < 2; iter++){
+																		cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+																		DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+																		if (!roof_img.empty()){
+																			char buffer[50];
+																			sprintf(buffer, "roof_image_%06d.png", index);
+																			std::string img_filename = output_path + "/" + std::string(buffer);
+																			std::cout << img_filename << std::endl;
+																			cv::imwrite(img_filename, roof_img);
+																			{
+																				out_param << std::string(buffer);
+																				for (int cluster = 0; cluster < total; cluster++){
+																					out_param << ",";
+																					if (cluster == type){
+																						out_param << 1;
+																					}
+																					else
+																						out_param << 0;
 																				}
-																				else
-																					out_param << 0;
+																				out_param << "\n";
 																			}
-																			out_param << "\n";
+																			index++;
 																		}
-																		index++;
 																	}
 
 																}
@@ -677,27 +686,29 @@ int Generator::generate_four_edges_v2(int start_index, int type, int total, int 
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-									DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-									if (!roof_img.empty()){
-										char buffer[50];
-										sprintf(buffer, "roof_image_%08d.png", index);
-										std::string img_filename = output_path + "/" + std::string(buffer);
-										std::cout << img_filename << std::endl;
-										cv::imwrite(img_filename, roof_img);
-										{
-											out_param << std::string(buffer);
-											for (int cluster = 0; cluster < total; cluster++){
-												out_param << ",";
-												if (cluster == type){
-													out_param << 1;
+									for (int iter = 0; iter < 2; iter++){
+										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+										if (!roof_img.empty()){
+											char buffer[50];
+											sprintf(buffer, "roof_image_%06d.png", index);
+											std::string img_filename = output_path + "/" + std::string(buffer);
+											std::cout << img_filename << std::endl;
+											cv::imwrite(img_filename, roof_img);
+											{
+												out_param << std::string(buffer);
+												for (int cluster = 0; cluster < total; cluster++){
+													out_param << ",";
+													if (cluster == type){
+														out_param << 1;
+													}
+													else
+														out_param << 0;
 												}
-												else
-													out_param << 0;
+												out_param << "\n";
 											}
-											out_param << "\n";
+											index++;
 										}
-										index++;
 									}
 								}
 							}
@@ -729,8 +740,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 	std::vector<double> rotates;
 	rotates.resize(roof_paras.size());
 	// first rectangle
-	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
-		for (int roof_h = roof_min_size; roof_h <= height; roof_h += step_size){
+	for (int roof_w = roof_min_size; roof_w <= 0.6 * width; roof_w += step_size){
+		for (int roof_h = roof_min_size; roof_h <= 0.6 * height; roof_h += step_size){
 			for (int top_w = 0; top_w < width; top_w += 0.5 * step_size){
 				for (int top_h = 0; top_h < height; top_h += 0.5 * step_size){
 					int center_w = top_w + 0.5 * roof_w;
@@ -752,8 +763,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 					int bot_w = top_w + roof_w;
 					// check 
 					// second rectangle
-					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= width; roof_w_v1 += step_size){
-						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= height; roof_h_v1 += step_size){
+					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= 0.6 * width; roof_w_v1 += step_size){
+						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= 0.6 * height; roof_h_v1 += step_size){
 							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += 0.5 * step_size){
 								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += 0.5 * step_size){
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
@@ -779,8 +790,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 									if (!bTouch_0_1)
 										continue;
 									// third rectangle
-									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= width; roof_w_v2 += step_size){
-										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= height; roof_h_v2 += step_size){
+									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= 0.6 * width; roof_w_v2 += step_size){
+										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= 0.6 * height; roof_h_v2 += step_size){
 											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += 0.5 * step_size){
 												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += 0.5 * step_size){
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
@@ -809,8 +820,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 													if (!bTouch_1_2)
 														continue;
 													// fourth rectangle
-													for (int roof_w_v3 = roof_min_size; roof_w_v3 <= width; roof_w_v3 += step_size){
-														for (int roof_h_v3 = roof_min_size; roof_h_v3 <= height; roof_h_v3 += step_size){
+													for (int roof_w_v3 = roof_min_size; roof_w_v3 <= 0.6 * width; roof_w_v3 += step_size){
+														for (int roof_h_v3 = roof_min_size; roof_h_v3 <= 0.6 * height; roof_h_v3 += step_size){
 															for (int top_w_v3 = 0; top_w_v3 < width; top_w_v3 += 0.5 * step_size){
 																for (int top_h_v3 = 0; top_h_v3 < height; top_h_v3 += 0.5 * step_size){
 																	int center_w_v3 = top_w_v3 + 0.5 * roof_w_v3;
@@ -861,28 +872,29 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 																		continue;
 																	if (dis_left * dis_top != 0)
 																		continue;
-
-																	cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-																	DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-																	if (!roof_img.empty()){
-																		char buffer[50];
-																		sprintf(buffer, "roof_image_%08d.png", index);
-																		std::string img_filename = output_path + "/" + std::string(buffer);
-																		std::cout << img_filename << std::endl;
-																		cv::imwrite(img_filename, roof_img);
-																		{
-																			out_param << std::string(buffer);
-																			for (int cluster = 0; cluster < total; cluster++){
-																				out_param << ",";
-																				if (cluster == type){
-																					out_param << 1;
+																	for (int iter = 0; iter < 2; iter++){
+																		cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+																		DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+																		if (!roof_img.empty()){
+																			char buffer[50];
+																			sprintf(buffer, "roof_image_%06d.png", index);
+																			std::string img_filename = output_path + "/" + std::string(buffer);
+																			std::cout << img_filename << std::endl;
+																			cv::imwrite(img_filename, roof_img);
+																			{
+																				out_param << std::string(buffer);
+																				for (int cluster = 0; cluster < total; cluster++){
+																					out_param << ",";
+																					if (cluster == type){
+																						out_param << 1;
+																					}
+																					else
+																						out_param << 0;
 																				}
-																				else
-																					out_param << 0;
+																				out_param << "\n";
 																			}
-																			out_param << "\n";
+																			index++;
 																		}
-																		index++;
 																	}
 
 																}
@@ -1000,6 +1012,9 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 													bool bIntersect = utils::rectIntersecRect(centers_w[0], centers_h[0], imageRoofsWidth[0], imageRoofsHeight[0], centers_w[2], centers_h[2], imageRoofsWidth[2], imageRoofsHeight[2]);
 													if (bIntersect)
 														continue;
+													// same size of v1 and v2
+													if ((imageRoofsWidth[0] != imageRoofsWidth[2]) || (imageRoofsHeight[0] != imageRoofsHeight[2]))
+														continue;
 													int bot_h_v2 = top_h_v2 + roof_h_v2;
 													int bot_w_v2 = top_w_v2 + roof_w_v2;
 													bool bTouch_1_2 = utils::relation_L(top_w_v1, top_h_v1, bot_w_v1, bot_h_v1, top_w_v2, top_h_v2, bot_w_v2, bot_h_v2);
@@ -1025,27 +1040,29 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 														continue;
 													if (dis_left * dis_top != 0)
 														continue;
-													cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-													DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
-													if (!roof_img.empty()){
-														char buffer[50];
-														sprintf(buffer, "roof_image_%08d.png", index);
-														std::string img_filename = output_path + "/" + std::string(buffer);
-														std::cout << img_filename << std::endl;
-														cv::imwrite(img_filename, roof_img);
-														{
-															out_param << std::string(buffer);
-															for (int cluster = 0; cluster < total; cluster++){
-																out_param << ",";
-																if (cluster == type){
-																	out_param << 1;
+													for (int iter = 0; iter < 15; iter++){
+														cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+														DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+														if (!roof_img.empty()){
+															char buffer[50];
+															sprintf(buffer, "roof_image_%06d.png", index);
+															std::string img_filename = output_path + "/" + std::string(buffer);
+															std::cout << img_filename << std::endl;
+															cv::imwrite(img_filename, roof_img);
+															{
+																out_param << std::string(buffer);
+																for (int cluster = 0; cluster < total; cluster++){
+																	out_param << ",";
+																	if (cluster == type){
+																		out_param << 1;
+																	}
+																	else
+																		out_param << 0;
 																}
-																else
-																	out_param << 0;
+																out_param << "\n";
 															}
-															out_param << "\n";
+															index++;
 														}
-														index++;
 													}
 												}
 											}

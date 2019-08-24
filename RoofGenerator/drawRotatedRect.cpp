@@ -71,7 +71,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 				for (int i = vertices[0].x; i <= vertices[3].x; i += 2 * kernel)
 					points.push_back(cv::Point(i, vertices[0].y));
 				for (int i = 0; i < points.size(); i++){
-					kernel = utils::genRand(1, 5);
+					kernel = utils::genRand(0, 4);
 					if (utils::genRand(0.0, 1.0) > threshold){
 						if ((int)utils::genRand(0, 2)  % 2 == 0){
 							cv::circle(roof_img, points[i], kernel, cv::Scalar(255, 255, 255), -1);
