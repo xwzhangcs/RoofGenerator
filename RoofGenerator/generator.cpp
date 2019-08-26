@@ -22,6 +22,8 @@ int Generator::generate_one_edge(int start_index, int type, int total, int width
 					int dis_right = width - top_w - roof_w;
 					int dis_top = top_h;
 					int dis_bot = height - top_h - roof_h;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					// condition 1
 					if (dis_left != dis_right || dis_top != dis_bot)
 						continue;
@@ -85,6 +87,8 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					// add first 
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
@@ -101,6 +105,8 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									// condition 1
 									if (center_w == center_w_v1 && center_h == center_h_v1 && roof_w == roof_w_v1 && roof_h == roof_h_v1)
@@ -121,7 +127,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									if (dis_left != dis_right || dis_top != dis_bot)
 										continue;
 									// condition 3
-									if (dis_left * dis_top != 0)
+									if (dis_left != 0 || dis_top != 0)
 										continue;
 									//
 									// add second
@@ -131,7 +137,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 1; iter++){
+									for (int iter = 0; iter < 10; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -183,6 +189,8 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					// add first 
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
@@ -199,6 +207,8 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									// condition 1
 									if (center_w == center_w_v1 && center_h == center_h_v1 && roof_w == roof_w_v1 && roof_h == roof_h_v1)
@@ -219,7 +229,7 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 									if (dis_left != dis_right || dis_top != dis_bot)
 										continue;
 									// condition 3
-									if (dis_left * dis_top != 0)
+									if (dis_left != 0 || dis_top != 0)
 										continue;
 									//
 									// add second
@@ -229,7 +239,7 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 2; iter++){
+									for (int iter = 0; iter < 1; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -291,6 +301,8 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
 					roof_paras[0].push_back(center_h);
@@ -311,6 +323,8 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									roof_paras[1].clear();
 									roof_paras[1].push_back(center_w_v1);
@@ -341,6 +355,8 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
+														continue;
+													if (roof_w_v2 > 0.7 * width && roof_h_v2 > 0.7 * height)
 														continue;
 													roof_paras[2].clear();
 													roof_paras[2].push_back(center_w_v2);
@@ -387,9 +403,9 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 													}
 													if (dis_left != dis_right || dis_top != dis_bot)
 														continue;
-													if (dis_left * dis_top != 0)
+													if (dis_left != 0 || dis_top != 0)
 														continue;
-													for (int iter = 0; iter < 10; iter++){
+													for (int iter = 0; iter < 1; iter++){
 														cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 														DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 														if (!roof_img.empty()){
@@ -455,6 +471,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
 					roof_paras[0].push_back(center_h);
@@ -477,6 +495,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									roof_paras[1].clear();
 									roof_paras[1].push_back(center_w_v1);
@@ -504,6 +524,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
+														continue;
+													if (roof_w_v2 > 0.7 * width && roof_h_v2 > 0.7 * height)
 														continue;
 													roof_paras[2].clear();
 													roof_paras[2].push_back(center_w_v2);
@@ -534,6 +556,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 																	int center_w_v3 = top_w_v3 + 0.5 * roof_w_v3;
 																	int center_h_v3 = top_h_v3 + 0.5 * roof_h_v3;
 																	if (!utils::rectInsideRect(width, height, center_w_v3, center_h_v3, roof_w_v3, roof_h_v3))
+																		continue;
+																	if (roof_w_v3 > 0.7 * width && roof_h_v3 > 0.7 * height)
 																		continue;
 																	roof_paras[3].clear();
 																	roof_paras[3].push_back(center_w_v3);
@@ -577,9 +601,9 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 																	}
 																	if (dis_left != dis_right || dis_top != dis_bot)
 																		continue;
-																	if (dis_left * dis_top != 0)
+																	if (dis_left != 0 || dis_top != 0)
 																		continue;
-																	for (int iter = 0; iter < 2; iter++){
+																	for (int iter = 0; iter < 9; iter++){
 																		cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 																		DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 																		if (!roof_img.empty()){
@@ -640,6 +664,8 @@ int Generator::generate_four_edges_v2(int start_index, int type, int total, int 
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					// add first 
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
@@ -656,6 +682,8 @@ int Generator::generate_four_edges_v2(int start_index, int type, int total, int 
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									// condition 1
 									if (center_w == center_w_v1 && center_h == center_h_v1 && roof_w == roof_w_v1 && roof_h == roof_h_v1)
@@ -676,7 +704,7 @@ int Generator::generate_four_edges_v2(int start_index, int type, int total, int 
 									if (dis_left != dis_right || dis_top != dis_bot)
 										continue;
 									// condition 3
-									if (dis_left * dis_top != 0)
+									if (dis_left != 0 || dis_top != 0)
 										continue;
 									//
 									// add second
@@ -686,7 +714,7 @@ int Generator::generate_four_edges_v2(int start_index, int type, int total, int 
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 2; iter++){
+									for (int iter = 0; iter < 1; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -748,6 +776,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
 					roof_paras[0].push_back(center_h);
@@ -770,6 +800,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									roof_paras[1].clear();
 									roof_paras[1].push_back(center_w_v1);
@@ -797,6 +829,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
+														continue;
+													if (roof_w_v2 > 0.7 * width && roof_h_v2 > 0.7 * height)
 														continue;
 													roof_paras[2].clear();
 													roof_paras[2].push_back(center_w_v2);
@@ -827,6 +861,8 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 																	int center_w_v3 = top_w_v3 + 0.5 * roof_w_v3;
 																	int center_h_v3 = top_h_v3 + 0.5 * roof_h_v3;
 																	if (!utils::rectInsideRect(width, height, center_w_v3, center_h_v3, roof_w_v3, roof_h_v3))
+																		continue;
+																	if (roof_w_v3 > 0.7 * width && roof_h_v3 > 0.7 * height)
 																		continue;
 																	roof_paras[3].clear();
 																	roof_paras[3].push_back(center_w_v3);
@@ -870,9 +906,9 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 																	}
 																	if (dis_left != dis_right || dis_top != dis_bot)
 																		continue;
-																	if (dis_left * dis_top != 0)
+																	if (dis_left != 0 || dis_top != 0)
 																		continue;
-																	for (int iter = 0; iter < 2; iter++){
+																	for (int iter = 0; iter < 20; iter++){
 																		cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 																		DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 																		if (!roof_img.empty()){
@@ -943,6 +979,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
 						continue;
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
 					roof_paras[0].push_back(center_h);
@@ -963,6 +1001,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
 										continue;
 									roof_paras[1].clear();
 									roof_paras[1].push_back(center_w_v1);
@@ -993,6 +1033,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
+														continue;
+													if (roof_w_v2 > 0.7 * width && roof_h_v2 > 0.7 * height)
 														continue;
 													roof_paras[2].clear();
 													roof_paras[2].push_back(center_w_v2);
@@ -1038,9 +1080,9 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 													}
 													if (dis_left != dis_right || dis_top != dis_bot)
 														continue;
-													if (dis_left * dis_top != 0)
+													if (dis_left != 0 || dis_top != 0)
 														continue;
-													for (int iter = 0; iter < 15; iter++){
+													for (int iter = 0; iter < 90; iter++){
 														cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 														DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 														if (!roof_img.empty()){

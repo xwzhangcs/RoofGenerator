@@ -40,12 +40,22 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
 	cv::resize(roof_img, roof_img, cv::Size(width, height));
+	int step_dis = 4;
 	if (selected_roof_type == RoofTypes::FLAT){
 		for (int index = 0; index < roof_paras.size(); index++){
-			int center_w = roof_paras[index][0];
-			int center_h = roof_paras[index][1];
-			int imageRoofWidth = roof_paras[index][2];
-			int imageRoofHeight = roof_paras[index][3];
+			int center_w = roof_paras[index][0] + utils::genRand(-step_dis, step_dis);
+			int center_h = roof_paras[index][1] + utils::genRand(-step_dis, step_dis);
+			int imageRoofWidth = roof_paras[index][2] + utils::genRand(-step_dis, step_dis);
+			int imageRoofHeight = roof_paras[index][3] + utils::genRand(-step_dis, step_dis);
+			if (center_w - 0.5 * imageRoofWidth < 0 || center_w + 0.5 * imageRoofWidth > roof_img.size().width){
+				center_w = roof_paras[index][0];
+				imageRoofWidth = roof_paras[index][2];
+			}
+			if (center_h - 0.5 * imageRoofHeight < 0 || center_h + 0.5 * imageRoofHeight > roof_img.size().height){
+				center_h = roof_paras[index][1];
+				imageRoofHeight = roof_paras[index][3];
+			}
+
 			cv::Point2f center(center_w + padding, center_h + padding);
 			cv::RotatedRect rRect = cv::RotatedRect(center, cv::Size2f(imageRoofWidth, imageRoofHeight), roof_paras[index][4]);
 			cv::Point2f vertices[4];
@@ -56,7 +66,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 			cv::rectangle(roof_img, vertices[1], vertices[3], fg_color_set[7], -1);
 			// add noise
 
-			if (true)
+			if (false)
 			{
 				float threshold = 0.50;
 				int kernel = 3;
