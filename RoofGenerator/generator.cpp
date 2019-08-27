@@ -39,7 +39,7 @@ int Generator::generate_one_edge(int start_index, int type, int total, int width
 					roof_paras[0].push_back(roof_w);
 					roof_paras[0].push_back(roof_h);
 					roof_paras[0].push_back(0);
-					for (int iter = 0; iter < 100; iter++){
+					for (int iter = 0; iter < 200; iter++){
 						cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 						DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 						if (!roof_img.empty()){
@@ -372,12 +372,12 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 													// condition 1
 													if (centers_w[2] == centers_w[1] && centers_h[2] == centers_h[1] && imageRoofsWidth[2] == imageRoofsWidth[1] && imageRoofsHeight[2] == imageRoofsHeight[1])
 														continue;
-													// 
-													bool bIntersect = utils::rectIntersecRect(centers_w[1], centers_h[1], imageRoofsWidth[1], imageRoofsHeight[1], centers_w[2], centers_h[2], imageRoofsWidth[2], imageRoofsHeight[2]);
-													if (bIntersect)
-														continue;
 													// same size of v1 and v2
 													if ((imageRoofsWidth[1] != imageRoofsWidth[2]) || (imageRoofsHeight[1] != imageRoofsHeight[2]))
+														continue;
+													//
+													bool bIntersect = utils::rectIntersecRect(centers_w[1], centers_h[1], imageRoofsWidth[1], imageRoofsHeight[1], centers_w[2], centers_h[2], imageRoofsWidth[2], imageRoofsHeight[2]);
+													if (bIntersect)
 														continue;
 													//
 													int bot_h_v2 = top_h_v2 + roof_h_v2;
@@ -444,7 +444,7 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 	return index;
 }
 
-int Generator::generate_four_edges_v1(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path){
+int Generator::generate_four_edges_v2(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path){
 	std::ofstream out_param(output_path + "/parameters.txt", std::ios::app);
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(0, 0, 255); // bgr
@@ -465,8 +465,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 	// first rectangle
 	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
 		for (int roof_h = roof_min_size; roof_h <= height; roof_h += step_size){
-			for (int top_w = 0; top_w < width; top_w += 0.5 * step_size){
-				for (int top_h = 0; top_h < height; top_h += 0.5 * step_size){
+			for (int top_w = 0; top_w < width; top_w += step_size){
+				for (int top_h = 0; top_h < height; top_h += step_size){
 					int center_w = top_w + 0.5 * roof_w;
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
@@ -490,8 +490,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 					// second rectangle
 					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= width; roof_w_v1 += step_size){
 						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= height; roof_h_v1 += step_size){
-							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += 0.5 * step_size){
-								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += 0.5 * step_size){
+							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += step_size){
+								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += step_size){
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
@@ -519,8 +519,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 									// third rectangle
 									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= width; roof_w_v2 += step_size){
 										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= height; roof_h_v2 += step_size){
-											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += 0.5 * step_size){
-												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += 0.5 * step_size){
+											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += step_size){
+												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += step_size){
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
@@ -551,8 +551,8 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 													// fourth rectangle
 													for (int roof_w_v3 = roof_min_size; roof_w_v3 <= width; roof_w_v3 += step_size){
 														for (int roof_h_v3 = roof_min_size; roof_h_v3 <= height; roof_h_v3 += step_size){
-															for (int top_w_v3 = 0; top_w_v3 < width; top_w_v3 += 0.5 * step_size){
-																for (int top_h_v3 = 0; top_h_v3 < height; top_h_v3 += 0.5 * step_size){
+															for (int top_w_v3 = 0; top_w_v3 < width; top_w_v3 += step_size){
+																for (int top_h_v3 = 0; top_h_v3 < height; top_h_v3 += step_size){
 																	int center_w_v3 = top_w_v3 + 0.5 * roof_w_v3;
 																	int center_h_v3 = top_h_v3 + 0.5 * roof_h_v3;
 																	if (!utils::rectInsideRect(width, height, center_w_v3, center_h_v3, roof_w_v3, roof_h_v3))
@@ -647,7 +647,7 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 	return index;
 }
 
-int Generator::generate_four_edges_v2(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path){
+int Generator::generate_four_edges_v1(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path){
 	std::ofstream out_param(output_path + "/parameters.txt", std::ios::app);
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
@@ -768,10 +768,10 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 	std::vector<double> rotates;
 	rotates.resize(roof_paras.size());
 	// first rectangle
-	for (int roof_w = roof_min_size; roof_w <= 0.6 * width; roof_w += step_size){
-		for (int roof_h = roof_min_size; roof_h <= 0.6 * height; roof_h += step_size){
-			for (int top_w = 0; top_w < width; top_w += 0.5 * step_size){
-				for (int top_h = 0; top_h < height; top_h += 0.5 * step_size){
+	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
+		for (int roof_h = roof_min_size; roof_h <= height; roof_h += step_size){
+			for (int top_w = 0; top_w < width; top_w += step_size){
+				for (int top_h = 0; top_h < height; top_h += step_size){
 					int center_w = top_w + 0.5 * roof_w;
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
@@ -793,10 +793,10 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 					int bot_w = top_w + roof_w;
 					// check 
 					// second rectangle
-					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= 0.6 * width; roof_w_v1 += step_size){
-						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= 0.6 * height; roof_h_v1 += step_size){
-							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += 0.5 * step_size){
-								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += 0.5 * step_size){
+					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= width; roof_w_v1 += step_size){
+						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= height; roof_h_v1 += step_size){
+							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += step_size){
+								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += step_size){
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
@@ -822,10 +822,10 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 									if (!bTouch_0_1)
 										continue;
 									// third rectangle
-									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= 0.6 * width; roof_w_v2 += step_size){
-										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= 0.6 * height; roof_h_v2 += step_size){
-											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += 0.5 * step_size){
-												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += 0.5 * step_size){
+									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= width; roof_w_v2 += step_size){
+										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= height; roof_h_v2 += step_size){
+											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += step_size){
+												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += step_size){
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
@@ -854,10 +854,10 @@ int Generator::generate_four_edges_v3(int start_index, int type, int total, int 
 													if (!bTouch_1_2)
 														continue;
 													// fourth rectangle
-													for (int roof_w_v3 = roof_min_size; roof_w_v3 <= 0.6 * width; roof_w_v3 += step_size){
-														for (int roof_h_v3 = roof_min_size; roof_h_v3 <= 0.6 * height; roof_h_v3 += step_size){
-															for (int top_w_v3 = 0; top_w_v3 < width; top_w_v3 += 0.5 * step_size){
-																for (int top_h_v3 = 0; top_h_v3 < height; top_h_v3 += 0.5 * step_size){
+													for (int roof_w_v3 = roof_min_size; roof_w_v3 <= width; roof_w_v3 += step_size){
+														for (int roof_h_v3 = roof_min_size; roof_h_v3 <= height; roof_h_v3 += step_size){
+															for (int top_w_v3 = 0; top_w_v3 < width; top_w_v3 += step_size){
+																for (int top_h_v3 = 0; top_h_v3 < height; top_h_v3 += step_size){
 																	int center_w_v3 = top_w_v3 + 0.5 * roof_w_v3;
 																	int center_h_v3 = top_h_v3 + 0.5 * roof_h_v3;
 																	if (!utils::rectInsideRect(width, height, center_w_v3, center_h_v3, roof_w_v3, roof_h_v3))
@@ -973,8 +973,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 	// first rectangle
 	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
 		for (int roof_h = roof_min_size; roof_h <= height; roof_h += step_size){
-			for (int top_w = 0; top_w < width; top_w += 0.5 * step_size){
-				for (int top_h = 0; top_h < height; top_h += 0.5 * step_size){
+			for (int top_w = 0; top_w < width; top_w += step_size){
+				for (int top_h = 0; top_h < height; top_h += step_size){
 					int center_w = top_w + 0.5 * roof_w;
 					int center_h = top_h + 0.5 * roof_h;
 					if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
@@ -996,8 +996,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 					// second rectangle
 					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= width; roof_w_v1 += step_size){
 						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= height; roof_h_v1 += step_size){
-							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += 0.5 * step_size){
-								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += 0.5 * step_size){
+							for (int top_w_v1 = 0; top_w_v1 < width; top_w_v1 += step_size){
+								for (int top_h_v1 = 0; top_h_v1 < height; top_h_v1 += step_size){
 									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
 									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
 									if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
@@ -1028,8 +1028,8 @@ int Generator::generate_four_edges_v4(int start_index, int type, int total, int 
 									// third rectangle
 									for (int roof_w_v2 = roof_min_size; roof_w_v2 <= width; roof_w_v2 += step_size){
 										for (int roof_h_v2 = roof_min_size; roof_h_v2 <= height; roof_h_v2 += step_size){
-											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += 0.5 * step_size){
-												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += 0.5 * step_size){
+											for (int top_w_v2 = 0; top_w_v2 < width; top_w_v2 += step_size){
+												for (int top_h_v2 = 0; top_h_v2 < height; top_h_v2 += step_size){
 													int center_w_v2 = top_w_v2 + 0.5 * roof_w_v2;
 													int center_h_v2 = top_h_v2 + 0.5 * roof_h_v2;
 													if (!utils::rectInsideRect(width, height, center_w_v2, center_h_v2, roof_w_v2, roof_h_v2))
