@@ -75,7 +75,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 2 * step_size;
+	int roof_min_size = 3 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
 	// first rectangle
@@ -137,7 +137,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 10; iter++){
+									for (int iter = 0; iter < 1; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -177,7 +177,7 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 2 * step_size;
+	int roof_min_size = 3 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
 	// first rectangle
@@ -279,7 +279,7 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(0, 0, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 2 * step_size;
+	int roof_min_size = 3 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(3);
 	std::vector<int> imageRoofsWidth;
@@ -656,7 +656,7 @@ int Generator::generate_four_edges_v1(int start_index, int type, int total, int 
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 2 * step_size;
+	int roof_min_size = 3 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
 	// first rectangle
@@ -2261,6 +2261,108 @@ int Generator::generate_five_edges_v6(int start_index, int type, int total, int 
 													}
 												}
 											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return index;
+}
+
+int Generator::test_generate_edges(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path){
+	std::ofstream out_param(output_path + "/parameters.txt", std::ios::app);
+	cv::Scalar bg_color(0, 0, 0);
+	cv::Scalar fg_color(255, 255, 255); // bgr
+	int index = start_index;
+	int roof_min_size = 2 * step_size;
+	std::vector<std::vector<int>> roof_paras;
+	roof_paras.resize(2);
+	// first rectangle
+	for (int roof_w = roof_min_size; roof_w <= width; roof_w += step_size){
+		for (int roof_h = roof_min_size; roof_h <= height; roof_h += step_size){
+			for (int top_w = 0; top_w <= width - roof_w; top_w += step_size){
+				for (int top_h = 0; top_h <= height - roof_h; top_h += step_size){
+					int center_w = top_w + 0.5 * roof_w;
+					int center_h = top_h + 0.5 * roof_h;
+					/*if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
+						continue;*/
+					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+						continue;
+					// add first 
+					roof_paras[0].clear();
+					roof_paras[0].push_back(center_w);
+					roof_paras[0].push_back(center_h);
+					roof_paras[0].push_back(roof_w);
+					roof_paras[0].push_back(roof_h);
+					roof_paras[0].push_back(0);
+					// check 
+					// second rectangle
+					for (int roof_w_v1 = roof_min_size; roof_w_v1 <= width; roof_w_v1 += step_size){
+						for (int roof_h_v1 = roof_min_size; roof_h_v1 <= height; roof_h_v1 += step_size){
+							for (int top_w_v1 = 0; top_w_v1 <= width - roof_w_v1; top_w_v1 += step_size){
+								for (int top_h_v1 = 0; top_h_v1 <= height - roof_h_v1; top_h_v1 += step_size){
+									int center_w_v1 = top_w_v1 + 0.5 * roof_w_v1;
+									int center_h_v1 = top_h_v1 + 0.5 * roof_h_v1;
+									/*if (!utils::rectInsideRect(width, height, center_w_v1, center_h_v1, roof_w_v1, roof_h_v1))
+										continue;*/
+									if (roof_w_v1 > 0.7 * width && roof_h_v1 > 0.7 * height)
+										continue;
+									// condition 1
+									if (center_w == center_w_v1 && center_h == center_h_v1 && roof_w == roof_w_v1 && roof_h == roof_h_v1)
+										continue;
+									// touch
+									int bot_h = top_h + roof_h;
+									int bot_w = top_w + roof_w;
+									int bot_h_v1 = top_h_v1 + roof_h_v1;
+									int bot_w_v1 = top_w_v1 + roof_w_v1;
+									bool bTouch = utils::relation_L(top_w, top_h, bot_w, bot_h, top_w_v1, top_h_v1, bot_w_v1, bot_h_v1);
+									if (!bTouch)
+										continue;
+									int dis_left = top_w < top_w_v1 ? top_w : top_w_v1;
+									int dis_right = (top_w + roof_w) >(top_w_v1 + roof_w_v1) ? (width - top_w - roof_w) : (width - top_w_v1 - roof_w_v1);
+									int dis_top = top_h < top_h_v1 ? top_h : top_h_v1;;
+									int dis_bot = (top_h + roof_h) >(top_h_v1 + roof_h_v1) ? (height - top_h - roof_h) : (height - top_h_v1 - roof_h_v1);
+									// condition 2
+									if (dis_left != dis_right || dis_top != dis_bot)
+										continue;
+									// condition 3
+									if (dis_left != 0 || dis_top != 0)
+										continue;
+									//
+									// add second
+									roof_paras[1].clear();
+									roof_paras[1].push_back(center_w_v1);
+									roof_paras[1].push_back(center_h_v1);
+									roof_paras[1].push_back(roof_w_v1);
+									roof_paras[1].push_back(roof_h_v1);
+									roof_paras[1].push_back(0);
+									for (int iter = 0; iter < 1; iter++){
+										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
+										if (!roof_img.empty()){
+											char buffer[50];
+											sprintf(buffer, "roof_image_%06d.png", index);
+											std::string img_filename = output_path + "/" + std::string(buffer);
+											std::cout << img_filename << std::endl;
+											cv::imwrite(img_filename, roof_img);
+											{
+												out_param << std::string(buffer);
+												for (int cluster = 0; cluster < total; cluster++){
+													out_param << ",";
+													if (cluster == type){
+														out_param << 1;
+													}
+													else
+														out_param << 0;
+												}
+												out_param << "\n";
+											}
+											index++;
 										}
 									}
 								}

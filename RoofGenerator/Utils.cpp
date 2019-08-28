@@ -240,15 +240,15 @@ namespace utils {
 		if (bDir_v1 == bDir_v2)
 			return false;
 		if ((top_w_v2 == top_w_v1 && bot_w_v2 < bot_w_v1) || (bot_w_v2 == bot_w_v1 && top_w_v2 > top_w_v1)){
-			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && bot_h_v2 > bot_h_v1)
+			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && (bot_h_v2 - bot_h_v1) > 0.2 * (bot_h_v2 - top_h_v1))
 				return true;
-			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && top_h_v2 < top_h_v1)
+			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && (top_h_v1 - top_h_v2) > 0.2 * (bot_h_v1 - top_h_v2))
 				return true;
 		}
 		if ((top_h_v2 == top_h_v1 && bot_h_v2 < bot_h_v1) || (bot_h_v2 == bot_h_v1 && top_h_v2 > top_h_v1)){
-			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && bot_w_v2 > bot_w_v1)
+			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && (bot_w_v2 - bot_w_v1) >  0.2 *(bot_w_v2 - top_w_v1))
 				return true;
-			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && top_w_v2 < top_w_v1)
+			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && (top_w_v1 - top_w_v2) > 0.2 * (bot_w_v1 - top_w_v2))
 				return true;
 		}
 		return false;
@@ -351,16 +351,20 @@ namespace utils {
 		bool bDir_v2 = (bot_w_v2 - top_w_v2) > (bot_h_v2 - top_h_v2) ? true : false;
 		if (bDir_v1 == bDir_v2)
 			return false;
+		// add more constrain
 		if ((top_w_v2 > top_w_v1 && bot_w_v2 < bot_w_v1)){
-			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && bot_h_v2 > bot_h_v1)
+			// smallest dis
+			int small_dis = (top_w_v2 - top_w_v1) < (bot_w_v1 - bot_w_v2) ? top_w_v2 - top_w_v1 : bot_w_v1 - bot_w_v2;
+			if (top_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && bot_h_v2 > bot_h_v1 && small_dis > 0.2 * (bot_w_v1 - top_w_v1))
 				return true;
-			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && top_h_v2 < top_h_v1)
+			if (bot_h_v2 == 0.5 * (top_h_v1 + bot_h_v1) && top_h_v2 < top_h_v1 && small_dis > 0.2 * (bot_w_v1 - top_w_v1))
 				return true;
 		}
 		if (top_h_v2 > top_h_v1 && bot_h_v2 < bot_h_v1){
-			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && bot_w_v2 > bot_w_v1)
+			int small_dis = (top_h_v2 - top_h_v1) < (bot_h_v1 - bot_h_v2) ? top_h_v2 - top_h_v1 : bot_h_v1 - bot_h_v2;
+			if (top_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && bot_w_v2 > bot_w_v1 && small_dis > 0.2 * (bot_h_v1 - top_h_v1))
 				return true;
-			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && top_w_v2 < top_w_v1)
+			if (bot_w_v2 == 0.5 * (top_w_v1 + bot_w_v1) && top_w_v2 < top_w_v1 && small_dis > 0.2 * (bot_h_v1 - top_h_v1))
 				return true;
 		}
 		return false;
@@ -386,17 +390,25 @@ namespace utils {
 		if (l1.y > r2.y || l2.y > r1.y)
 			return false;
 		if (l1.x < l2.x && r1.x > r2.x && l2.y < l1.y && r2.y > r1.y){
-			if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
+			int small_dis_x = (l2.x - l1.x) > (r1.x - r2.x) ? r1.x - r2.x : l2.x - l1.x;
+			int small_dis_y = (l1.y - l2.y) > (r2.y - r1.y) ? r2.y - r1.y : l1.y - l2.y;
+			if (small_dis_x > 0.2 * (r1.x - l1.x) && small_dis_y > 0.2 * (r2.y - l2.y))
+				return true;
+			/*if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
 				return true;
 			else
-				return false;
+				return false;*/
 		}
 
 		if (l2.x < l1.x && r2.x > r1.x && l1.y < l2.y && r1.y > r2.y){
-			if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
+			int small_dis_x = (l1.x - l2.x) > (r2.x - r1.x) ? r2.x - r1.x : l1.x - l2.x;
+			int small_dis_y = (l2.y - l1.y) > (r1.y - r2.y) ? r1.y - r2.y : l2.y - l1.y;
+			if (small_dis_x > 0.2 * (r2.x - l2.x) && small_dis_y > 0.2 * (r1.y - l1.y))
+				return true;
+			/*if ((l2.x - l1.x == r1.x - r2.x) || (l1.y - l2.y == r2.y - r1.y))
 				return true;
 			else
-				return false;
+				return false;*/
 		}
 		return false;
 	}
