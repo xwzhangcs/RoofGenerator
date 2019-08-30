@@ -40,7 +40,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, std::vector<
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
 	cv::resize(roof_img, roof_img, cv::Size(width, height));
-	int step_dis = 0;
+	int step_dis = 2;
 	if (selected_roof_type == RoofTypes::FLAT){
 		for (int index = 0; index < roof_paras.size(); index++){
 			int center_w = roof_paras[index][0] + utils::genRand(-step_dis, step_dis);
