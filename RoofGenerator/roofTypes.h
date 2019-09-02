@@ -2,7 +2,8 @@ enum RoofTypes
 {
 	FLAT,
 	GABLE,
-	HIP
+	HIP,
+	GABLE_HIP
 };
 
 enum RoofRelationship

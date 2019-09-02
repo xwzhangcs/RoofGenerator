@@ -30,4 +30,6 @@ public:
 	static int generate_five_edges_v6(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path);
 
 	static int test_generate_edges(int start_index, int type, int total, int width, int height, int step_size, int padding, std::string output_path);
+
+	static int generate_roof_type(int start_index, int type, int total, int roofType, int width, int height, int step_size, int padding, std::string output_path);
 };
