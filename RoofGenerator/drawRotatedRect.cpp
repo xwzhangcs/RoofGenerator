@@ -8,7 +8,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;
 	int center_h = center_y;
-	int thickness = 2;
+	int thickness = 3;
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
 	cv::resize(roof_img, roof_img, cv::Size(width, height));
@@ -264,7 +264,7 @@ void DrawRotatedRect::generateRect(cv::Mat & roof_img, int padding, int center_x
 	int imageRoofHeight = roofHeight;
 	int center_w = center_x;
 	int center_h = center_y;
-	int thickness = 2;
+	int thickness = 3;
 	int width = roof_img.size().width + padding * 2;
 	int height = roof_img.size().height + padding * 2;
 	cv::resize(roof_img, roof_img, cv::Size(width, height));

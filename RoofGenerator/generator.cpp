@@ -2392,20 +2392,21 @@ int Generator::generate_roof_type(int start_index, int type, int total, int roof
 					int dis_right = width - top_w - roof_w;
 					int dis_top = top_h;
 					int dis_bot = height - top_h - roof_h;
-					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
-						continue;
+					//if (roof_w > 0.7 * width && roof_h > 0.7 * height)
+					//	continue;
 					// condition 1
 					if (dis_left != dis_right || dis_top != dis_bot)
 						continue;
 					// condition 2
-					if (dis_left * dis_top != 0)
+					if (dis_left != 0 || dis_top != 0)
 						continue;
 					if (roofType == RoofTypes::FLAT){
-						for (int iter = 0; iter < 8; iter++){
-							int center_w_tmp = center_w + utils::genRand(-step_size, step_size);
-							int center_h_tmp = center_h + utils::genRand(-step_size, step_size);
-							int roof_w_tmp = roof_w + utils::genRand(-step_size, step_size);
-							int roof_h_tmp = roof_h + utils::genRand(-step_size, step_size);
+						int dis_ratio = 5;
+						for (int iter = 0; iter < 500; iter++){
+							int center_w_tmp = center_w + utils::genRand(-dis_ratio, dis_ratio);
+							int center_h_tmp = center_h + utils::genRand(-dis_ratio, dis_ratio);
+							int roof_w_tmp = roof_w + utils::genRand(-dis_ratio, dis_ratio);
+							int roof_h_tmp = roof_h + utils::genRand(-dis_ratio, dis_ratio);
 							cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 							DrawRotatedRect::generateRect(roof_img, padding, center_w_tmp, center_h_tmp, roof_w_tmp, roof_h_tmp, 0, RoofTypes::FLAT, bg_color, fg_color);
 							if (!roof_img.empty()){
@@ -2431,13 +2432,14 @@ int Generator::generate_roof_type(int start_index, int type, int total, int roof
 						}
 					}
 					else if (roofType == RoofTypes::GABLE){
-						for (int iter = 0; iter < 8; iter++){
+						int dis_ratio = 5;
+						for (int iter = 0; iter < 500; iter++){
 							cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-							int center_w_tmp = center_w + utils::genRand(-step_size, step_size);
-							int center_h_tmp = center_h + utils::genRand(-step_size, step_size);
-							int roof_w_tmp = roof_w + utils::genRand(-step_size, step_size);
-							int roof_h_tmp = roof_h + utils::genRand(-step_size, step_size);
-							DrawRotatedRect::generateRect(roof_img, padding, center_w_tmp, center_h_tmp, roof_w_tmp, roof_h_tmp, 0, RoofTypes::HIP, false, 0, roof_w > roof_h ? roof_w_tmp : roof_h_tmp, bg_color, fg_color);
+							int center_w_tmp = center_w + utils::genRand(-dis_ratio, dis_ratio);
+							int center_h_tmp = center_h + utils::genRand(-dis_ratio, dis_ratio);
+							int roof_w_tmp = roof_w + utils::genRand(-dis_ratio, dis_ratio);
+							int roof_h_tmp = roof_h + utils::genRand(-dis_ratio, dis_ratio);
+							DrawRotatedRect::generateRect(roof_img, padding, center_w_tmp, center_h_tmp, roof_w_tmp, roof_h_tmp, 0, RoofTypes::HIP, true, 0.03, roof_w > roof_h ? roof_w_tmp : roof_h_tmp, bg_color, fg_color);
 							if (!roof_img.empty()){
 								char buffer[50];
 								sprintf(buffer, "roof_image_%06d.png", index);
@@ -2461,54 +2463,68 @@ int Generator::generate_roof_type(int start_index, int type, int total, int roof
 						}
 					}
 					else if (roofType == RoofTypes::HIP){
-						for (float ridge_ratio = 0.5; ridge_ratio < 0.9; ridge_ratio += 0.05){
-							cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-							DrawRotatedRect::generateRect(roof_img, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::HIP, false, 0, roof_w > roof_h ? roof_w * ridge_ratio : roof_h * ridge_ratio, bg_color, fg_color);
-							if (!roof_img.empty()){
-								char buffer[50];
-								sprintf(buffer, "roof_image_%06d.png", index);
-								std::string img_filename = output_path + "/" + std::string(buffer);
-								std::cout << img_filename << std::endl;
-								cv::imwrite(img_filename, roof_img);
-								{
-									out_param << std::string(buffer);
-									for (int cluster = 0; cluster < total; cluster++){
-										out_param << ",";
-										if (cluster == type){
-											out_param << 1;
+						int dis_ratio = 5;
+						for (float ridge_ratio = 0.4; ridge_ratio < 0.8; ridge_ratio += 0.02){
+							for (int iter = 0; iter < 25; iter++){
+								cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+								int center_w_tmp = center_w + utils::genRand(-dis_ratio, dis_ratio);
+								int center_h_tmp = center_h + utils::genRand(-dis_ratio, dis_ratio);
+								int roof_w_tmp = roof_w + utils::genRand(-dis_ratio, dis_ratio);
+								int roof_h_tmp = roof_h + utils::genRand(-dis_ratio, dis_ratio);
+								DrawRotatedRect::generateRect(roof_img, padding, center_w_tmp, center_h_tmp, roof_w_tmp, roof_h_tmp, 0, RoofTypes::HIP, false, 0, roof_w_tmp > roof_h_tmp ? roof_w_tmp * ridge_ratio : roof_h_tmp * ridge_ratio, bg_color, fg_color);
+								if (!roof_img.empty()){
+									char buffer[50];
+									sprintf(buffer, "roof_image_%06d.png", index);
+									std::string img_filename = output_path + "/" + std::string(buffer);
+									std::cout << img_filename << std::endl;
+									cv::imwrite(img_filename, roof_img);
+									{
+										out_param << std::string(buffer);
+										for (int cluster = 0; cluster < total; cluster++){
+											out_param << ",";
+											if (cluster == type){
+												out_param << 1;
+											}
+											else
+												out_param << 0;
 										}
-										else
-											out_param << 0;
+										out_param << "\n";
 									}
-									out_param << "\n";
+									index++;
 								}
-								index++;
 							}
 						}
 					}
 					else if (roofType == RoofTypes::GABLE_HIP){
-						for (float ridge_ratio = 0.5; ridge_ratio < 0.9; ridge_ratio += 0.05){
-							cv::Mat roof_img(height, width, CV_8UC3, bg_color);
-							DrawRotatedRect::generateRect(roof_img, padding, center_w, center_h, roof_w, roof_h, 0, RoofTypes::GABLE_HIP, false, 0, roof_w > roof_h ? roof_w * ridge_ratio : roof_h * ridge_ratio, bg_color, fg_color);
-							if (!roof_img.empty()){
-								char buffer[50];
-								sprintf(buffer, "roof_image_%06d.png", index);
-								std::string img_filename = output_path + "/" + std::string(buffer);
-								std::cout << img_filename << std::endl;
-								cv::imwrite(img_filename, roof_img);
-								{
-									out_param << std::string(buffer);
-									for (int cluster = 0; cluster < total; cluster++){
-										out_param << ",";
-										if (cluster == type){
-											out_param << 1;
+						int dis_ratio = 5;
+						for (float ridge_ratio = 0.4; ridge_ratio < 0.8; ridge_ratio += 0.02){
+							for (int iter = 0; iter < 25; iter++){
+								cv::Mat roof_img(height, width, CV_8UC3, bg_color);
+								int center_w_tmp = center_w + utils::genRand(-dis_ratio, dis_ratio);
+								int center_h_tmp = center_h + utils::genRand(-dis_ratio, dis_ratio);
+								int roof_w_tmp = roof_w + utils::genRand(-dis_ratio, dis_ratio);
+								int roof_h_tmp = roof_h + utils::genRand(-dis_ratio, dis_ratio);
+								DrawRotatedRect::generateRect(roof_img, padding, center_w_tmp, center_h_tmp, roof_w_tmp, roof_h_tmp, 0, RoofTypes::GABLE_HIP, false, 0, roof_w_tmp > roof_h_tmp ? roof_w_tmp * ridge_ratio : roof_h_tmp * ridge_ratio, bg_color, fg_color);
+								if (!roof_img.empty()){
+									char buffer[50];
+									sprintf(buffer, "roof_image_%06d.png", index);
+									std::string img_filename = output_path + "/" + std::string(buffer);
+									std::cout << img_filename << std::endl;
+									cv::imwrite(img_filename, roof_img);
+									{
+										out_param << std::string(buffer);
+										for (int cluster = 0; cluster < total; cluster++){
+											out_param << ",";
+											if (cluster == type){
+												out_param << 1;
+											}
+											else
+												out_param << 0;
 										}
-										else
-											out_param << 0;
+										out_param << "\n";
 									}
-									out_param << "\n";
+									index++;
 								}
-								index++;
 							}
 						}
 					}

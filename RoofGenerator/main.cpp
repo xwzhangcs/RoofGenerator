@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	int total = 4;
 	int start_index = 0;
 	int resolution = 192;
-	int step = 2;
+	int step = 12;
 	start_index = Generator::generate_roof_type(start_index, 0, total, RoofTypes::FLAT, resolution, resolution, step, padding, "../data/roof_type"); // 120
 	start_index = Generator::generate_roof_type(start_index, 1, total, RoofTypes::GABLE, resolution, resolution, step, padding, "../data/roof_type"); // 120
 	start_index = Generator::generate_roof_type(start_index, 2, total, RoofTypes::HIP, resolution, resolution, step, padding, "../data/roof_type"); // 960
