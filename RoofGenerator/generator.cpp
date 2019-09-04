@@ -22,8 +22,6 @@ int Generator::generate_one_edge(int start_index, int type, int total, int width
 					int dis_right = width - top_w - roof_w;
 					int dis_top = top_h;
 					int dis_bot = height - top_h - roof_h;
-					if (roof_w > 0.7 * width && roof_h > 0.7 * height)
-						continue;
 					// condition 1
 					if (dis_left != dis_right || dis_top != dis_bot)
 						continue;
@@ -31,15 +29,15 @@ int Generator::generate_one_edge(int start_index, int type, int total, int width
 					if (dis_left * dis_top != 0)
 						continue;
 					// condition 3
-					/*if (!utils::rectInsideRect(width, height, center_w, center_h, roof_w, roof_h))
-						continue;*/
+					if (dis_left != 0 || dis_top != 0)
+						continue;
 					roof_paras[0].clear();
 					roof_paras[0].push_back(center_w);
 					roof_paras[0].push_back(center_h);
 					roof_paras[0].push_back(roof_w);
 					roof_paras[0].push_back(roof_h);
 					roof_paras[0].push_back(0);
-					for (int iter = 0; iter < 200; iter++){
+					for (int iter = 0; iter < 1; iter++){
 						cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 						DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 						if (!roof_img.empty()){
@@ -75,7 +73,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 3 * step_size;
+	int roof_min_size = 2 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
 	// first rectangle
@@ -137,7 +135,7 @@ int Generator::generate_two_edges(int start_index, int type, int total, int widt
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 14; iter++){
+									for (int iter = 0; iter < 1; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -177,7 +175,7 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(255, 255, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 3 * step_size;
+	int roof_min_size = 2 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(2);
 	// first rectangle
@@ -239,7 +237,7 @@ int Generator::generate_three_edges_v1(int start_index, int type, int total, int
 									roof_paras[1].push_back(roof_w_v1);
 									roof_paras[1].push_back(roof_h_v1);
 									roof_paras[1].push_back(0);
-									for (int iter = 0; iter < 5; iter++){
+									for (int iter = 0; iter < 1; iter++){
 										cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 										DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 										if (!roof_img.empty()){
@@ -279,7 +277,7 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 	cv::Scalar bg_color(0, 0, 0);
 	cv::Scalar fg_color(0, 0, 255); // bgr
 	int index = start_index;
-	int roof_min_size = 3 * step_size;
+	int roof_min_size = 2 * step_size;
 	std::vector<std::vector<int>> roof_paras;
 	roof_paras.resize(3);
 	std::vector<int> imageRoofsWidth;
@@ -407,7 +405,7 @@ int Generator::generate_three_edges_v2(int start_index, int type, int total, int
 														continue;
 													if (dis_left != 0 || dis_top != 0)
 														continue;
-													for (int iter = 0; iter < 22; iter++){
+													for (int iter = 0; iter < 1; iter++){
 														cv::Mat roof_img(height, width, CV_8UC3, bg_color);
 														DrawRotatedRect::generateRect(roof_img, padding, roof_paras, RoofTypes::FLAT, bg_color, fg_color);
 														if (!roof_img.empty()){
